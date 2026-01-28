@@ -29,7 +29,7 @@ return (
         },
         tabBarActiveTintColor: '#2563EB',
         tabBarInactiveTintColor: 'gray',
-        headerShown: true,
+        headerShown: false,
       })}
     >
     <Tab.Screen name="Home" component={Home} />
