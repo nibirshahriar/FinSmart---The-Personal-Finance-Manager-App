@@ -52,9 +52,10 @@ export const expensesData = [
   },
 ];
 
-
-
 const Home = ({navigation}) => {
+
+const totalSpent = expensesData.reduce((sum,item)=> sum + item.amount,0)
+
   return (
  <View>
    <View style={tailwind`px-5 pt-5 pb-3`}>
@@ -70,7 +71,7 @@ const Home = ({navigation}) => {
     Spent so far
   </Text>
   <Text style={tailwind`text-base text-white text-4xl mt-2 font-bold`}>
-    $ 400
+    Tk.{totalSpent.toFixed(2)}
   </Text>
 </View>
 
@@ -79,7 +80,7 @@ const Home = ({navigation}) => {
   data={expensesData}
   // data={[]}
   renderItem={({ item }) => <ExpenseItemCard item={item} />}
-  // keyExtractor={(item) => item}
+  keyExtractor={(item) => item.id}
   contentContainerStyle={{ paddingBottom: 20 }}
   ListEmptyComponent={<EmptyList />}
 />

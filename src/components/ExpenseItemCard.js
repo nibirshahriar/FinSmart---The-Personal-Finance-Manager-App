@@ -13,19 +13,19 @@ const ExpenseItemCard = ({item}) => {
  <View
     style={tailwind`w-12 h-12 rounded-xl bg-gray-100 justify-center items-center mr-4`}
   >
-<Text>{"🍔"}</Text>
+<Text>{item.icon}</Text>
   </View>
 
 <View>
   <Text style={tailwind`text-base font-bold text-gray-800`}>
-    {"Food"}
+    {item.title}
   </Text>
 {/* category */}
 <View
-  style={tailwind`mt-1 px-2 py-1 rounded-lg self-start bg-blue-100`}
->
+  style={[tailwind`mt-1 px-2 py-1 rounded-xl self-start bg-blue-100`,{backgroundColor: item.color}]}
+> 
   <Text style={tailwind`text-xs font-bold text-blue-700`}>
-    {"Food and Drinks"}
+    {item.category}
   </Text>
 </View>
 </View>
@@ -35,10 +35,10 @@ const ExpenseItemCard = ({item}) => {
 
 <View style={tailwind`items-end`}>
   <Text style={tailwind`text-base font-bold text-black`}>
-    {"$300"}
+    Tk.{item.amount}
   </Text>
   <Text style={tailwind`text-xs text-gray-500 mt-1`}>
-    {"27-01-2026"}
+    {item.date}
   </Text>
 </View>
 
