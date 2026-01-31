@@ -1,4 +1,12 @@
-import { ScrollView, StyleSheet, Text, View, TextInput } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Pressable,
+  Alert,
+} from "react-native";
 // import React from 'react'
 import tailwind from "twrnc";
 // import { TextInput } from 'react-native'
@@ -7,6 +15,24 @@ import React, { useState } from "react";
 const Create = () => {
   const [amount, setAmount] = useState(null);
 const [title, setTitle] = useState("");
+
+const handleAddExpense = () => {
+  const numericAmount = Number(amount);
+
+  if (!amount || !title) {
+    Alert.alert("Error", "All fields are required");
+    return;
+  }
+
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    Alert.alert("Error", "Amount must be greater than 0");
+    return;
+  }
+
+  console.log("amount:", numericAmount);//for this admin can know first ..then hit the info to API
+  console.log("title:", title);
+};
+
 
   return (
     <View>
@@ -34,7 +60,7 @@ const [title, setTitle] = useState("");
             onChangeText={setAmount}
           />
         </View>
- 
+
         {/* 2nd textinput */}
         <View style={tailwind`mb-5`}>
           <Text style={tailwind`text-lg font-semibold text-gray-600 mb-2`}>
@@ -50,8 +76,32 @@ const [title, setTitle] = useState("");
         </View>
 
         {/* 3rd input category */}
+        <View style={tailwind`mb-5`}>
+          <Text style={tailwind`text-lg font-semibold text-gray-600 mb-2`}>
+            Category
+          </Text>
+
+          <Pressable
+            style={tailwind`border border-gray-400 p-4 rounded-xl flex-row justify-between items-center`}
+          >
+            <View style={tailwind`flex-row items-center`}>
+              <Text style={tailwind`text-2xl mr-3`}>🍔</Text>
+              <Text style={tailwind`text-lg`}>Food</Text>
+            </View>
+
+            <Text style={tailwind`text-2xl`}>&gt;</Text>
+          </Pressable>
+        </View>
 
         {/* footer section */}
+        <Pressable
+          style={tailwind`bg-rose-600 p-6 rounded-xl mt-8`}
+          onPress={handleAddExpense}
+        >
+          <Text style={tailwind`text-white text-center text-lg font-bold`}>
+            Add Expense
+          </Text>
+        </Pressable>
       </ScrollView>
     </View>
   );
