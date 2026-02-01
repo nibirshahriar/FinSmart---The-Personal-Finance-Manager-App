@@ -12,14 +12,26 @@ import tailwind from "twrnc";
 // import { TextInput } from 'react-native'
 import React, { useState } from "react";
 
-const Create = ({ navigation }) => {
+const Create = ({ navigation ,route}) => {
   const [amount, setAmount] = useState(null);
   const [title, setTitle] = useState("");
+  
+  const [category, setCategory] = useState({});
+
+//react native library
+React.useEffect(() => {
+  if (route.params?.category) {
+    // do something
+console.log("selected category:", route.params?.category);
+setCategory(route.params?.category);
+  }
+}, [route.params?.category]);
+
 
   const handleAddExpense = () => {
     const numericAmount = Number(amount);
 
-    if (!amount || !title) {
+    if (!amount || !title || !category) {
       Alert.alert("Error", "All fields are required");
       return;
     }
@@ -31,6 +43,7 @@ const Create = ({ navigation }) => {
 
     console.log("amount:", numericAmount); //for this admin can know first ..then hit the info to API
     console.log("title:", title);
+    console.log("category:", category.name);
   };
 
   const handleCategoryInput = () => {
@@ -88,8 +101,8 @@ const Create = ({ navigation }) => {
             style={tailwind`border border-gray-400 p-4 rounded-xl flex-row justify-between items-center`}
           >
             <View style={tailwind`flex-row items-center`}>
-              <Text style={tailwind`text-2xl mr-3`}>🍔</Text>
-              <Text style={tailwind`text-lg`}>Food</Text>
+              <Text style={tailwind`text-2xl mr-3`}>{category.icon || '🍔'}</Text>
+              <Text style={tailwind`text-lg`}>{category.name || 'Food'}</Text>
             </View>
 
             <Text style={tailwind`text-2xl`}>&gt;</Text>

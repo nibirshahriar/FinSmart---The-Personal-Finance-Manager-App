@@ -54,6 +54,7 @@ export const expensesData = [
 
 const Home = ({navigation}) => {
 
+
 const totalSpent = expensesData.reduce((sum,item)=> sum + item.amount,0)
 
   return (
