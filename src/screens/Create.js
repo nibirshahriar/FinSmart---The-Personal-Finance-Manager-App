@@ -12,28 +12,30 @@ import tailwind from "twrnc";
 // import { TextInput } from 'react-native'
 import React, { useState } from "react";
 
-const Create = () => {
+const Create = ({ navigation }) => {
   const [amount, setAmount] = useState(null);
-const [title, setTitle] = useState("");
+  const [title, setTitle] = useState("");
 
-const handleAddExpense = () => {
-  const numericAmount = Number(amount);
+  const handleAddExpense = () => {
+    const numericAmount = Number(amount);
 
-  if (!amount || !title) {
-    Alert.alert("Error", "All fields are required");
-    return;
-  }
+    if (!amount || !title) {
+      Alert.alert("Error", "All fields are required");
+      return;
+    }
 
-  if (isNaN(numericAmount) || numericAmount <= 0) {
-    Alert.alert("Error", "Amount must be greater than 0");
-    return;
-  }
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      Alert.alert("Error", "Amount must be greater than 0");
+      return;
+    }
 
-  console.log("amount:", numericAmount);//for this admin can know first ..then hit the info to API
-  console.log("title:", title);
-};
+    console.log("amount:", numericAmount); //for this admin can know first ..then hit the info to API
+    console.log("title:", title);
+  };
 
-
+  const handleCategoryInput = () => {
+    navigation.navigate("Category");
+  };
   return (
     <View>
       <ScrollView contentContainerStyle={tailwind`p-6`}>
@@ -82,6 +84,7 @@ const handleAddExpense = () => {
           </Text>
 
           <Pressable
+            onPress={handleCategoryInput}
             style={tailwind`border border-gray-400 p-4 rounded-xl flex-row justify-between items-center`}
           >
             <View style={tailwind`flex-row items-center`}>
