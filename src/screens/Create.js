@@ -50,7 +50,7 @@ const Create = ({ navigation, route }) => {
     setTitle("");
     setCategory(null);
 
-    // go back to Home
+    // go back
     navigation.goBack();
   };
 
@@ -108,7 +108,7 @@ const Create = ({ navigation, route }) => {
           >
             <View style={tailwind`flex-row items-center`}>
               <Text style={tailwind`text-2xl mr-3`}>
-                {category ? category.icon : "🔘"}
+                {category ? category.icon : "☰"}
               </Text>
               <Text style={tailwind`text-lg`}>
                 {category ? category.name : "Select Category"}
