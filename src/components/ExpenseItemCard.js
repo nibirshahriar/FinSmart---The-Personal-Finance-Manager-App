@@ -4,7 +4,11 @@ import tailwind from 'twrnc'
 
 const ExpenseItemCard = ({item}) => {
 
-//1.title, 2.icon , 3.category 4.amount and date
+//1.title,
+// 2.icon
+// , 3.category
+// 4.amount and date
+
   return (
     <View style={tailwind`bg-white rounded-2xl p-4 mx-5 mb-3 flex-row justify-between items-center shadow-sm`}>
 

@@ -1,0 +1,18 @@
+export const CATEGORIES = [
+  { id: 1, name: "Food", icon: "🍔", color: "#FFD700" },
+  { id: 2, name: "Bills/Utilities", icon: "💡", color: "#FFA07A" },
+  { id: 3, name: "Family", icon: "👨‍👩‍👧‍👦", color: "#90EE90" },
+  { id: 4, name: "Healthcare", icon: "🏥", color: "#FF7F7F" },
+  { id: 5, name: "Fuel", icon: "⛽", color: "#FF8C00" },
+  { id: 6, name: "Phone/Internet", icon: "📱", color: "#87CEEB" },
+  { id: 7, name: "Education", icon: "🎓", color: "#9370DB" },
+  { id: 8, name: "Entertainment", icon: "🎬", color: "#E6E6FA" },
+  { id: 9, name: "Shopping", icon: "🛍️", color: "#FF69B4" },
+  { id: 10, name: "Travel", icon: "✈️", color: "#00CED1" },
+  { id: 11, name: "Socializing", icon: "🍻", color: "#CD853F" },
+  { id: 12, name: "Withdrawal", icon: "🏧", color: "#D3D3D3" },
+  { id: 13, name: "Transfer", icon: "🔁", color: "#32CD32" },
+  { id: 14, name: "Transportation", icon: "🚗", color: "#FFA500" },
+  { id: 15, name: "Housing", icon: "🏠", color: "#ADD8E6" },
+  { id: 16, name: "Miscellaneous", icon: "📦", color: "#808080" },
+];

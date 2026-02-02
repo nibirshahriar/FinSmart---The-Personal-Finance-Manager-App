@@ -7,26 +7,23 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-// import React from 'react'
+import React, { useState, useEffect } from "react";
 import tailwind from "twrnc";
-// import { TextInput } from 'react-native'
-import React, { useState } from "react";
+import { useExpenses } from "../context/ExpenseContext";
 
-const Create = ({ navigation ,route}) => {
-  const [amount, setAmount] = useState(null);
+const Create = ({ navigation, route }) => {
+  const { addExpense } = useExpenses();
+
+  const [amount, setAmount] = useState("");
   const [title, setTitle] = useState("");
-  
-  const [category, setCategory] = useState({});
+  const [category, setCategory] = useState(null);
 
-//react native library
-React.useEffect(() => {
-  if (route.params?.category) {
-    // do something
-console.log("selected category:", route.params?.category);
-setCategory(route.params?.category);
-  }
-}, [route.params?.category]);
-
+  // receive selected category from Category screen
+  useEffect(() => {
+    if (route.params?.category) {
+      setCategory(route.params.category);
+    }
+  }, [route.params?.category]);
 
   const handleAddExpense = () => {
     const numericAmount = Number(amount);
@@ -41,18 +38,30 @@ setCategory(route.params?.category);
       return;
     }
 
-    console.log("amount:", numericAmount); //for this admin can know first ..then hit the info to API
-    console.log("title:", title);
-    console.log("category:", category.name);
+    // add expense to context
+    addExpense({
+      title,
+      amount: numericAmount,
+      category,
+    });
+
+    // reset form
+    setAmount("");
+    setTitle("");
+    setCategory(null);
+
+    // go back to Home
+    navigation.goBack();
   };
 
   const handleCategoryInput = () => {
     navigation.navigate("Category");
   };
+
   return (
-    <View>
+    <View style={tailwind`flex-1 bg-white`}>
       <ScrollView contentContainerStyle={tailwind`p-6`}>
-        {/* Header section */}
+        {/* Header */}
         <Text style={tailwind`text-3xl font-bold text-black`}>
           Create New Expense
         </Text>
@@ -60,37 +69,34 @@ setCategory(route.params?.category);
           Enter the details of your expenses
         </Text>
 
-        {/* form section */}
-
+        {/* Amount */}
         <View style={tailwind`mb-6`}>
-          {/* 1st textinput */}
           <Text style={tailwind`text-lg font-semibold text-gray-600 mb-2`}>
             Enter Amount
           </Text>
-
           <TextInput
             placeholder="Tk. 0.00"
-            style={tailwind`border-2 border-green-500 p-4 rounded-2xl text-lg`}
+            keyboardType="numeric"
             value={amount}
             onChangeText={setAmount}
+            style={tailwind`border-2 border-green-500 p-4 rounded-2xl text-lg`}
           />
         </View>
 
-        {/* 2nd textinput */}
+        {/* Title */}
         <View style={tailwind`mb-5`}>
           <Text style={tailwind`text-lg font-semibold text-gray-600 mb-2`}>
             Title
           </Text>
-
           <TextInput
             placeholder="What was it for?"
-            style={tailwind`border-2 border-gray-300 p-4 rounded-xl text-lg`}
             value={title}
             onChangeText={setTitle}
+            style={tailwind`border-2 border-gray-300 p-4 rounded-xl text-lg`}
           />
         </View>
 
-        {/* 3rd input category */}
+        {/* Category */}
         <View style={tailwind`mb-5`}>
           <Text style={tailwind`text-lg font-semibold text-gray-600 mb-2`}>
             Category
@@ -101,15 +107,18 @@ setCategory(route.params?.category);
             style={tailwind`border border-gray-400 p-4 rounded-xl flex-row justify-between items-center`}
           >
             <View style={tailwind`flex-row items-center`}>
-              <Text style={tailwind`text-2xl mr-3`}>{category.icon || '🍔'}</Text>
-              <Text style={tailwind`text-lg`}>{category.name || 'Food'}</Text>
+              <Text style={tailwind`text-2xl mr-3`}>
+                {category ? category.icon : "🔘"}
+              </Text>
+              <Text style={tailwind`text-lg`}>
+                {category ? category.name : "Select Category"}
+              </Text>
             </View>
-
             <Text style={tailwind`text-2xl`}>&gt;</Text>
           </Pressable>
         </View>
 
-        {/* footer section */}
+        {/* Submit Button */}
         <Pressable
           style={tailwind`bg-rose-600 p-6 rounded-xl mt-8`}
           onPress={handleAddExpense}
