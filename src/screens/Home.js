@@ -29,8 +29,10 @@ const Home = ({ navigation }) => {
         </Text>
       </View>
 
-      <View style={tailwind`bg-black rounded-3xl p-6 my-5 mx-5 items-center`}>
-        <Text style={tailwind`text-base text-gray-400`}>Spent so far</Text>
+      <View
+        style={tailwind`bg-violet-600 rounded-3xl p-6 my-5 mx-5 items-center`}
+      >
+        <Text style={tailwind`text-base text-gray-300`}>Spent so far</Text>
         <Text style={tailwind`text-white text-4xl mt-2 font-bold`}>
           Tk.{totalSpent.toFixed(2)}
         </Text>

@@ -78,7 +78,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
   );
 };
 
-export default LoginScreen; // ✅ CORRECT PLACE
+export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
