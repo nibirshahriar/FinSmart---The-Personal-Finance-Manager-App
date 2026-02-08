@@ -1,15 +1,16 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { StatusBar } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import Home from "../screens/Home";
 import Create from "../screens/Create";
-import Insights from "../screens/Insights";
-import Profile from "../screens/Profile";
-import { Ionicons } from "@expo/vector-icons";
+import Insights from "../screens/Insights"; 
 import Category from "../screens/Category";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-//bottom tabs
+
+// Bottom Tabs
 function MyTabs() {
   return (
     <Tab.Navigator
@@ -39,19 +40,40 @@ function MyTabs() {
   );
 }
 
-export default function AppNavigator() {
-  //stack screen
+// Stack Navigator
   //inside stack--> we will call our bottom tabs as one of the screens
-
+export default function AppNavigator() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="BottomTabs" component={MyTabs} />
-      <Stack.Screen
-        name="Category"
-        component={Category}
-        options={{ presentation: "modal", headerShown: false }}
-      />
-      {/* <Stack.Screen name="Profile" component={Profile} /> */}
-    </Stack.Navigator>
+    <>
+      <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
+      <Stack.Navigator>
+        <Stack.Screen
+          name="FinSmart"
+          component={MyTabs}
+          options={{
+            headerStyle: {
+              backgroundColor: "#0f172a",
+              height: 90,
+            },
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+              fontSize: 22,
+              fontWeight: "bold",
+              paddingTop: 40,
+            },
+            headerTitleAlign: "center",
+          }}
+        />
+
+        <Stack.Screen
+          name="Category"
+          component={Category}
+          options={{
+            presentation: "modal",
+            headerShown: false,
+          }}
+        />
+      </Stack.Navigator>
+    </>
   );
 }

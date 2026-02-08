@@ -5,6 +5,7 @@ import {
   Text,
   View,
   FlatList,
+  Alert,
 } from "react-native";
 import React from "react";
 import tailwind from "twrnc";
@@ -13,12 +14,27 @@ import ExpenseItemCard from "../components/ExpenseItemCard";
 import { useExpenses } from "../context/ExpenseContext";
 
 const Home = ({ navigation }) => {
-  const { expenses } = useExpenses();
+  const { expenses, clearAllExpenses } = useExpenses();
 
   const totalSpent = expenses.reduce(
     (sum, item) => sum + Number(item.amount),
     0,
   );
+  // clear all confirmation
+  const handleClearAll = () => {
+    Alert.alert(
+      "Clear All Expenses",
+      "Are you sure you want to delete all expenses?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Clear All",
+          style: "destructive",
+          onPress: clearAllExpenses,
+        },
+      ],
+    );
+  };
 
   return (
     <View style={tailwind`flex-1 bg-white`}>
@@ -32,18 +48,32 @@ const Home = ({ navigation }) => {
       <View
         style={tailwind`bg-violet-600 rounded-3xl p-6 my-5 mx-5 items-center`}
       >
-        <Text style={tailwind`text-base text-gray-300`}>Spent so far</Text>
+        <Text style={tailwind`text-base text-gray-200`}>
+          Your Total Expenses :
+        </Text>
         <Text style={tailwind`text-white text-4xl mt-2 font-bold`}>
           Tk.{totalSpent.toFixed(2)}
         </Text>
       </View>
-
       <FlatList
         data={expenses}
         renderItem={({ item }) => <ExpenseItemCard item={item} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={<EmptyList />}
+        ListFooterComponent={
+          /* Clear All Button */
+          expenses.length > 0 ? (
+            <Pressable
+              onPress={handleClearAll}
+              style={tailwind`bg-red-500 mx-5 mt-4 py-3 rounded-xl`}
+            >
+              <Text style={tailwind`text-white text-center font-bold`}>
+                Clear All Expenses
+              </Text>
+            </Pressable>
+          ) : null
+        }
       />
     </View>
   );

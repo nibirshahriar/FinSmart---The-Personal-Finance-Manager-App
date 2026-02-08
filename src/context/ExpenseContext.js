@@ -10,7 +10,7 @@ export function ExpenseProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Get data from storage
-//this is will run in the initial moment
+  // this is will run in the initial moment
   useEffect(() => {
     const getData = async () => {
       try {
@@ -28,13 +28,15 @@ export function ExpenseProvider({ children }) {
   }, []);
 
   // Save data to storage
-//this will work only when the expenses list wil be changes
+  // this will work only when the expenses list wil be changes
   useEffect(() => {
     if (!isLoading) {
       const saveExpenses = async () => {
         try {
           await AsyncStorage.setItem("expensesList", JSON.stringify(expenses));
-        } catch (error) {}
+        } catch (error) {
+          console.error("Save failed", error);
+        }
       };
 
       // call this function
@@ -52,12 +54,37 @@ export function ExpenseProvider({ children }) {
       color: getCategoryColor(expense.category.color),
       icon: expense.category.icon,
     };
-    //update the list
+    // update the list
     setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
   };
 
+  // delete single expense
+  const deleteExpense = (id) => {
+    setExpenses((prevExpenses) =>
+      prevExpenses.filter((item) => item.id !== id),
+    );
+  };
+
+  // clear all expenses
+  const clearAllExpenses = async () => {
+    try {
+      setExpenses([]); // clear state
+      await AsyncStorage.removeItem("expensesList"); // clear storage
+    } catch (error) {
+      console.error("Clear all failed", error);
+    }
+  };
+
   return (
-    <ExpenseContext.Provider value={{ expenses, addExpense }}>
+    // <ExpenseContext.Provider value={{ expenses, addExpense }}>
+    <ExpenseContext.Provider
+      value={{
+        expenses,
+        addExpense,
+        deleteExpense,
+        clearAllExpenses,
+      }}
+    >
       {children}
     </ExpenseContext.Provider>
   );

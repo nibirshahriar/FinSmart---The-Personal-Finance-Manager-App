@@ -28,7 +28,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Email (admin@gmail.com)"
+        placeholder="Enter Your Email"
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
@@ -37,7 +37,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Password (123456)"
+        placeholder="Password"
         secureTextEntry
         value={password}
         onChangeText={setPassword}

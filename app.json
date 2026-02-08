@@ -1,10 +1,10 @@
 {
   "expo": {
     "name": "FinSmart",
-    "slug": "FinSmart",
+    "slug": "finsmart",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon3.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -23,7 +23,9 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon3.png",
+      "name": "FinSmart",
+      "shortName": "FinSmart"
     }
   }
 }
