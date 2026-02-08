@@ -3,6 +3,7 @@
 import { StyleSheet, Text, View, Pressable, FlatList } from "react-native";
 import React from "react";
 import tailwind from "twrnc";
+import { useTheme } from "../context/ThemeContext";
 
 const CATEGORIES = [
   { id: 1, name: "Food", icon: "🍔", color: "#FFD700" },
@@ -24,38 +25,76 @@ const CATEGORIES = [
 ];
 
 const Category = ({ navigation }) => {
+  const { isDarkMode } = useTheme();
+
   const handleSelectedCategory = (category) => {
-    console.log("category selected", category)
+    console.log("category selected", category);
 
-navigation.popTo("BottomTabs", {
-  screen: "Create",
-  params: { category },
-});
-
+    navigation.popTo("FinSmart", {
+      screen: "Create",
+      params: { category },
+    });
   };
 
   const renderItem = ({ item }) => {
     return (
       <Pressable
         onPress={() => handleSelectedCategory(item)}
-        style={tailwind`flex-1 items-center p-4 m-2.5 bg-white rounded-xl shadow-sm border border-gray-200`}
+        style={[
+          tailwind`flex-1 items-center p-4 m-2.5 rounded-xl shadow-sm border`,
+          {
+            backgroundColor: isDarkMode ? "#020617" : "#fff",
+            borderColor: isDarkMode ? "#334155" : "#e5e7eb",
+          },
+        ]}
       >
         <Text style={tailwind`text-3xl text-center`}>{item.icon}</Text>
-        <Text style={tailwind`mt-2 text-center`}>{item.name}</Text>
+        <Text
+          style={[
+            tailwind`mt-2 text-center`,
+            { color: isDarkMode ? "#e5e7eb" : "#374151" },
+          ]}
+        >
+          {item.name}
+        </Text>
       </Pressable>
     );
   };
+
   return (
-    <View style={tailwind`flex-1`}>
+    <View
+      style={[
+        tailwind`flex-1`,
+        { backgroundColor: isDarkMode ? "#020617" : "#fff" },
+      ]}
+    >
       <View style={tailwind`p-4`}>
         <Pressable onPress={() => navigation.goBack()}>
-          <Text style={tailwind`text-2xl font-bold mt-6`}>X</Text>
+          <Text
+            style={[
+              tailwind`text-2xl font-bold mt-6`,
+              { color: isDarkMode ? "#fff" : "#000" },
+            ]}
+          >
+            X
+          </Text>
         </Pressable>
-        <Text style={tailwind`text-3xl font-bold text-black mt-3`}>
+
+        <Text
+          style={[
+            tailwind`text-3xl font-bold mt-3`,
+            { color: isDarkMode ? "#fff" : "#000" },
+          ]}
+        >
           Select Category
         </Text>
 
-        <Text style={tailwind`text-base text-gray-500 mb-2 mt-2`}>
+        <Text
+          style={[
+            tailwind`text-base mb-2 mt-2`,
+            { color: isDarkMode ? "#94a3b8" : "#6b7280" },
+          ]}
+        >
           Select a category that best describes what you spent money on
         </Text>
       </View>

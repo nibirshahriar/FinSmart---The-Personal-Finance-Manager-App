@@ -5,12 +5,14 @@ import { ExpenseProvider } from "./src/context/ExpenseContext";
 import AppNavigator from "./src/navigation/AppNavigator";
 import LoginScreen from "./src/screens/LoginScreen";
 import React, { useState } from "react";
+import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 
-export default function App() {
+const Root = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isDarkMode } = useTheme();
 
   return (
-    <ExpenseProvider>
+    <>
       <NavigationContainer>
         {isLoggedIn ? (
           <AppNavigator />
@@ -19,8 +21,18 @@ export default function App() {
         )}
       </NavigationContainer>
 
-      <StatusBar style="auto" />
-    </ExpenseProvider>
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+    </>
+  );
+};
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <ExpenseProvider>
+        <Root />
+      </ExpenseProvider>
+    </ThemeProvider>
   );
 }
 

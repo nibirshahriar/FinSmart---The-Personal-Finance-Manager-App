@@ -12,9 +12,13 @@ import tailwind from "twrnc";
 import EmptyList from "../components/EmptyList";
 import ExpenseItemCard from "../components/ExpenseItemCard";
 import { useExpenses } from "../context/ExpenseContext";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../context/ThemeContext";
 
 const Home = ({ navigation }) => {
   const { expenses, clearAllExpenses } = useExpenses();
+
+  const { isDarkMode } = useTheme();
 
   const totalSpent = expenses.reduce(
     (sum, item) => sum + Number(item.amount),
@@ -37,16 +41,36 @@ const Home = ({ navigation }) => {
   };
 
   return (
-    <View style={tailwind`flex-1 bg-white`}>
+    <View
+      style={[
+        tailwind`flex-1`,
+        { backgroundColor: isDarkMode ? "#020617" : "#fff" },
+      ]}
+    >
       <View style={tailwind`px-5 pt-5 pb-3`}>
-        <Text style={tailwind`text-4xl font-bold text-black`}>Hello 👋</Text>
-        <Text style={tailwind`text-base text-gray-500 mt-1`}>
+        <Text
+          style={[
+            tailwind`text-4xl font-bold`,
+            { color: isDarkMode ? "#fff" : "#000" },
+          ]}
+        >
+          Hello 👋
+        </Text>
+        <Text
+          style={[
+            tailwind`text-base mt-1`,
+            { color: isDarkMode ? "#94a3b8" : "#6b7280" },
+          ]}
+        >
           Start tracking your expenses wisely
         </Text>
       </View>
 
       <View
-        style={tailwind`bg-violet-600 rounded-3xl p-6 my-5 mx-5 items-center`}
+        style={[
+          tailwind`rounded-3xl p-6 my-5 mx-5 items-center`,
+          { backgroundColor: isDarkMode ? "#312e81" : "#7c3aed" },
+        ]}
       >
         <Text style={tailwind`text-base text-gray-200`}>
           Your Total Expenses :
@@ -66,9 +90,10 @@ const Home = ({ navigation }) => {
           expenses.length > 0 ? (
             <Pressable
               onPress={handleClearAll}
-              style={tailwind`bg-red-500 mx-5 mt-4 py-3 rounded-xl`}
+              style={tailwind`bg-red-500 mx-5 mt-4 py-3 rounded-xl flex-row items-center justify-center`}
             >
-              <Text style={tailwind`text-white text-center font-bold`}>
+              <Ionicons name="trash-outline" size={22} color="#fff" />
+              <Text style={tailwind`text-white text-center font-bold ml-2`}>
                 Clear All Expenses
               </Text>
             </Pressable>

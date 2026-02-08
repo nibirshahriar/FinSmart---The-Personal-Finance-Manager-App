@@ -10,9 +10,11 @@ import {
 import React, { useState, useEffect } from "react";
 import tailwind from "twrnc";
 import { useExpenses } from "../context/ExpenseContext";
+import { useTheme } from "../context/ThemeContext";
 
 const Create = ({ navigation, route }) => {
   const { addExpense } = useExpenses();
+  const { isDarkMode } = useTheme();
 
   const [amount, setAmount] = useState("");
   const [title, setTitle] = useState("");
@@ -59,58 +61,124 @@ const Create = ({ navigation, route }) => {
   };
 
   return (
-    <View style={tailwind`flex-1 bg-white`}>
+    <View
+      style={[
+        tailwind`flex-1`,
+        { backgroundColor: isDarkMode ? "#020617" : "#fff" },
+      ]}
+    >
       <ScrollView contentContainerStyle={tailwind`p-6`}>
         {/* Header */}
-        <Text style={tailwind`text-3xl font-bold text-black`}>
+        <Text
+          style={[
+            tailwind`text-3xl font-bold`,
+            { color: isDarkMode ? "#fff" : "#000" },
+          ]}
+        >
           Create New Expense
         </Text>
-        <Text style={tailwind`text-base text-gray-500 mt-2 mb-8`}>
+
+        <Text
+          style={[
+            tailwind`text-base mt-2 mb-8`,
+            { color: isDarkMode ? "#94a3b8" : "#6b7280" },
+          ]}
+        >
           Enter the details of your expenses
         </Text>
 
         {/* Amount */}
         <View style={tailwind`mb-6`}>
-          <Text style={tailwind`text-lg font-semibold text-gray-600 mb-2`}>
+          <Text
+            style={[
+              tailwind`text-lg font-semibold mb-2`,
+              { color: isDarkMode ? "#cbd5f5" : "#374151" },
+            ]}
+          >
             Enter Amount
           </Text>
+
           <TextInput
             placeholder="Tk. 0.00"
+            placeholderTextColor={isDarkMode ? "#64748b" : "#9ca3af"}
             keyboardType="numeric"
             value={amount}
             onChangeText={setAmount}
-            style={tailwind`border-2 border-green-500 p-4 rounded-2xl text-lg`}
+            style={[
+              tailwind`border-2 p-4 rounded-2xl text-lg`,
+              {
+                backgroundColor: isDarkMode ? "#020617" : "#fff",
+                color: isDarkMode ? "#fff" : "#000",
+                borderColor: isDarkMode ? "#334155" : "#22c55e",
+              },
+            ]}
           />
         </View>
 
         {/* Title */}
         <View style={tailwind`mb-5`}>
-          <Text style={tailwind`text-lg font-semibold text-gray-600 mb-2`}>
+          <Text
+            style={[
+              tailwind`text-lg font-semibold mb-2`,
+              { color: isDarkMode ? "#cbd5f5" : "#374151" },
+            ]}
+          >
             Title
           </Text>
+
           <TextInput
             placeholder="What was it for?"
+            placeholderTextColor={isDarkMode ? "#64748b" : "#9ca3af"}
             value={title}
             onChangeText={setTitle}
-            style={tailwind`border-2 border-gray-300 p-4 rounded-xl text-lg`}
+            style={[
+              tailwind`border-2 p-4 rounded-xl text-lg`,
+              {
+                backgroundColor: isDarkMode ? "#020617" : "#fff",
+                color: isDarkMode ? "#fff" : "#000",
+                borderColor: isDarkMode ? "#334155" : "#d1d5db",
+              },
+            ]}
           />
         </View>
 
         {/* Category */}
         <View style={tailwind`mb-5`}>
-          <Text style={tailwind`text-lg font-semibold text-gray-600 mb-2`}>
+          <Text
+            style={[
+              tailwind`text-lg font-semibold mb-2`,
+              { color: isDarkMode ? "#cbd5f5" : "#374151" },
+            ]}
+          >
             Category
           </Text>
 
           <Pressable
             onPress={handleCategoryInput}
-            style={tailwind`border border-gray-400 p-4 rounded-xl flex-row justify-between items-center`}
+            style={[
+              tailwind`border p-4 rounded-xl flex-row justify-between items-center`,
+              {
+                backgroundColor: isDarkMode ? "#020617" : "#fff",
+                borderColor: isDarkMode ? "#334155" : "#9ca3af",
+              },
+            ]}
           >
             <View style={tailwind`flex-row items-center`}>
-              <Text style={tailwind`text-2xl mr-3`}>
+              <Text
+                style={[
+                  tailwind`text-2xl mr-3`,
+                  { color: isDarkMode ? "#fff" : "#000" },
+                ]}
+              >
                 {category ? category.icon : "☰"}
               </Text>
-              <Text style={tailwind`text-lg`}>
+
+              <Text
+                style={[
+                  tailwind`text-lg`,
+                  { color: isDarkMode ? "#e5e7eb" : "#000" },
+                ]}
+              >
                 {category ? category.name : "Select Category"}
               </Text>
             </View>

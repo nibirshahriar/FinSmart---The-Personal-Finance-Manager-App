@@ -6,6 +6,8 @@ import Home from "../screens/Home";
 import Create from "../screens/Create";
 import Insights from "../screens/Insights"; 
 import Category from "../screens/Category";
+import Profile from "../screens/Profile";
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -36,6 +38,19 @@ function MyTabs() {
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Create" component={Create} />
       <Tab.Screen name="Insights" component={Insights} />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
