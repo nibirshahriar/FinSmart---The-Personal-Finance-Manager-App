@@ -2,23 +2,59 @@ import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
   Alert,
   ScrollView,
+  Image,
+  View,
+  ActivityIndicator,
 } from "react-native";
 
-const LoginScreen = ({ onLoginSuccess }) => {
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+} from "@react-native-firebase/auth";
+
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
+
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
+  const auth = getAuth();
+
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter both Email and Password");
-    } else {
-      Alert.alert("Success", "Login Successful!");
-      onLoginSuccess();
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+
+      if (
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/invalid-credential"
+      ) {
+        Alert.alert(
+          "Login Failed",
+          "Please sign in with a valid account or create a new one.",
+        );
+      } else if (error.code === "auth/wrong-password") {
+        Alert.alert("Login Failed", "Incorrect password.");
+      } else if (error.code === "auth/invalid-email") {
+        Alert.alert("Login Failed", "Invalid email format.");
+      } else {
+        Alert.alert("Login Failed", error.message);
+      }
     }
   };
 
@@ -26,9 +62,19 @@ const LoginScreen = ({ onLoginSuccess }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.logo}>FinSmart</Text>
 
+      <Image
+        source={require("../../assets/chat.png")}
+        style={styles.headerImage}
+      />
+
+      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.subtitle}>
+        Login to continue managing your income and expenses.
+      </Text>
+
       <TextInput
         style={styles.input}
-        placeholder="Enter Your Email"
+        placeholder="Email Address"
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
@@ -43,37 +89,51 @@ const LoginScreen = ({ onLoginSuccess }) => {
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>LOGIN</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>LOGIN</Text>
+        )}
       </TouchableOpacity>
 
-      <View style={styles.dividerContainer}>
+      {/* Divider */}
+      <View style={styles.divider}>
         <View style={styles.line} />
         <Text style={styles.orText}>OR</Text>
         <View style={styles.line} />
       </View>
 
-      <TouchableOpacity
-        style={[styles.socialButton, styles.googleButton]}
-        onPress={() => Alert.alert("Info", "Google Login coming soon!")}
-      >
-        <Text style={styles.socialButtonText}>Continue with Google</Text>
-      </TouchableOpacity>
+      {/* Social Buttons */}
+      <View style={styles.socialRow}>
+        <TouchableOpacity
+          style={[styles.socialButton, styles.googleButton]}
+          onPress={() => Alert.alert("Info", "Google Login coming soon!")}
+        >
+          <FontAwesome name="google" size={18} color="#db4437" />
+          <Text style={styles.googleText}> Continue with Google</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.socialButton, styles.phoneButton]}
-        onPress={() => Alert.alert("Info", "Phone Login coming soon!")}
-      >
-        <Text style={[styles.socialButtonText, { color: "#fff" }]}>
-          Login with Phone Number
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.socialButton, styles.phoneButton]}
+          onPress={() => Alert.alert("Info", "Phone Login coming soon!")}
+        >
+          <Ionicons name="call-outline" size={18} color="#fff" />
+          <Text style={styles.phoneText}> Login with Phone</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity style={styles.footerLink}>
-        <Text>
-          Don't have an account? <Text style={styles.signUpText}>Sign Up</Text>
-        </Text>
-      </TouchableOpacity>
+      {/* Signup */}
+      <View style={styles.signupContainer}>
+        <Text style={styles.signupText}>Don’t have an account?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+          <Text style={styles.signupButtonText}>Create Account</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -89,55 +149,116 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logo: {
-    fontSize: 35,
+    fontSize: 45,
     fontWeight: "bold",
-    marginBottom: 40,
-    color: "#2e7d32",
+    color: "#1f2937",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#111827",
+    marginTop: 10,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#6b7280",
+    textAlign: "center",
+    marginBottom: 30,
+    marginTop: 5,
   },
   input: {
     width: "100%",
     height: 55,
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
+    borderColor: "#e5e7eb",
+    borderRadius: 12,
     paddingHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#f9fafb",
   },
   button: {
     backgroundColor: "#2e7d32",
     width: "100%",
     height: 55,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
+    marginTop: 5,
     elevation: 3,
   },
-  buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-  dividerContainer: {
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    letterSpacing: 1,
+  },
+  divider: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 30,
+    marginVertical: 25,
     width: "100%",
   },
-  line: { flex: 1, height: 1, backgroundColor: "#ddd" },
-  orText: { marginHorizontal: 10, color: "#888" },
-  socialButton: {
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#e5e7eb",
+  },
+  orText: {
+    marginHorizontal: 10,
+    color: "#9ca3af",
+    fontWeight: "600",
+  },
+  socialRow: {
+    flexDirection: "row",
     width: "100%",
+    justifyContent: "space-between",
+  },
+  socialButton: {
+    flex: 1,
     height: 50,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
+    marginHorizontal: 5,
+    flexDirection: "row",
   },
   googleButton: {
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#db4437",
   },
-  phoneButton: { backgroundColor: "#444" },
-  socialButtonText: { fontSize: 16, fontWeight: "600", color: "#333" },
-  footerLink: { marginTop: 20 },
-  signUpText: { color: "#2e7d32", fontWeight: "bold" },
+  phoneButton: {
+    backgroundColor: "#111827",
+  },
+  googleText: {
+    fontWeight: "600",
+    fontSize: 14,
+    color: "#333",
+  },
+  phoneText: {
+    fontWeight: "600",
+    fontSize: 14,
+    color: "#fff",
+  },
+  signupContainer: {
+    flexDirection: "row",
+    marginTop: 30,
+    alignItems: "center",
+  },
+  signupText: {
+    color: "#6b7280",
+    fontSize: 14,
+  },
+  signupButtonText: {
+    marginLeft: 6,
+    color: "#2e7d32",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  headerImage: {
+    width: 280,
+    height: 150,
+    resizeMode: "contain",
+    marginVertical: 10,
+  },
 });

@@ -1,24 +1,43 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
+import { StyleSheet, ActivityIndicator, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+
+import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
+
 import { ExpenseProvider } from "./src/context/ExpenseContext";
-import AppNavigator from "./src/navigation/AppNavigator";
-import LoginScreen from "./src/screens/LoginScreen";
-import React, { useState } from "react";
 import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 
+import AppNavigator from "./src/navigation/AppNavigator";
+import AuthNavigator from "./src/navigation/AuthNavigator";
+
 const Root = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(undefined);
   const { isDarkMode } = useTheme();
+
+  useEffect(() => {
+    const auth = getAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  //Loading while checking auth state
+  if (user === undefined) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <>
       <NavigationContainer>
-        {isLoggedIn ? (
-          <AppNavigator />
-        ) : (
-          <LoginScreen onLoginSuccess={() => setIsLoggedIn(true)} />
-        )}
+        {user ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
 
       <StatusBar style={isDarkMode ? "light" : "dark"} />
@@ -36,4 +55,10 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

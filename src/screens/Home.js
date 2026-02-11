@@ -1,5 +1,4 @@
 import {
-  Button,
   Pressable,
   StyleSheet,
   Text,
@@ -14,16 +13,20 @@ import ExpenseItemCard from "../components/ExpenseItemCard";
 import { useExpenses } from "../context/ExpenseContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
+import { getAuth } from "@react-native-firebase/auth";
 
 const Home = ({ navigation }) => {
   const { expenses, clearAllExpenses } = useExpenses();
-
   const { isDarkMode } = useTheme();
+
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   const totalSpent = expenses.reduce(
     (sum, item) => sum + Number(item.amount),
     0,
   );
+
   // clear all confirmation
   const handleClearAll = () => {
     Alert.alert(
@@ -47,6 +50,7 @@ const Home = ({ navigation }) => {
         { backgroundColor: isDarkMode ? "#020617" : "#fff" },
       ]}
     >
+      {/* Header */}
       <View style={tailwind`px-5 pt-5 pb-3`}>
         <Text
           style={[
@@ -56,6 +60,18 @@ const Home = ({ navigation }) => {
         >
           Hello 👋
         </Text>
+
+        {user && (
+          <Text
+            style={[
+              tailwind`text-sm mt-1`,
+              { color: isDarkMode ? "#94a3b8" : "#6b7280" },
+            ]}
+          >
+            {user.email}
+          </Text>
+        )}
+
         <Text
           style={[
             tailwind`text-base mt-1`,
@@ -66,6 +82,7 @@ const Home = ({ navigation }) => {
         </Text>
       </View>
 
+      {/* Total Expense Card */}
       <View
         style={[
           tailwind`rounded-3xl p-6 my-5 mx-5 items-center`,
@@ -79,6 +96,7 @@ const Home = ({ navigation }) => {
           Tk.{totalSpent.toFixed(2)}
         </Text>
       </View>
+
       <FlatList
         data={expenses}
         renderItem={({ item }) => <ExpenseItemCard item={item} />}
@@ -86,7 +104,6 @@ const Home = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={<EmptyList />}
         ListFooterComponent={
-          /* Clear All Button */
           expenses.length > 0 ? (
             <Pressable
               onPress={handleClearAll}

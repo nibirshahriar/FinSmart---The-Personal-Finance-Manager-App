@@ -4,10 +4,9 @@ import { StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Home from "../screens/Home";
 import Create from "../screens/Create";
-import Insights from "../screens/Insights"; 
+import Insights from "../screens/Insights";
 import Category from "../screens/Category";
 import Profile from "../screens/Profile";
-
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -56,7 +55,7 @@ function MyTabs() {
 }
 
 // Stack Navigator
-  //inside stack--> we will call our bottom tabs as one of the screens
+//inside stack--> we will call our bottom tabs as one of the screens
 export default function AppNavigator() {
   return (
     <>
@@ -74,9 +73,12 @@ export default function AppNavigator() {
             headerTitleStyle: {
               fontSize: 22,
               fontWeight: "bold",
-              paddingTop: 40,
+              // paddingTop: 40,
             },
             headerTitleAlign: "center",
+            headerTitleContainerStyle: {
+              paddingTop: 10,
+            },
           }}
         />
 
