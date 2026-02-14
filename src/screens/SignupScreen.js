@@ -32,17 +32,26 @@ const SignupScreen = ({ navigation }) => {
     try {
       setLoading(true);
 
-      //Create new account
-      await createUserWithEmailAndPassword(auth, email.trim(), password);
+      //Create account
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password,
+      );
 
-      //Immediately logout so user must login manually
+      const user = userCredential.user;
+
+      //Send verification email
+      await user.sendEmailVerification();
+
+      //Force logout immediately (cannot enter Home without verify)
       await signOut(auth);
 
       setLoading(false);
 
       Alert.alert(
-        "Account Created",
-        "Your account has been created successfully. Please login.",
+        "Verification Required",
+        "Account created successfully.\n\nA verification link has been sent to your email.\n\nPlease verify your email before logging in.",
         [
           {
             text: "OK",
@@ -59,6 +68,8 @@ const SignupScreen = ({ navigation }) => {
         Alert.alert("Error", "Password must be at least 6 characters.");
       } else if (error.code === "auth/invalid-email") {
         Alert.alert("Error", "Invalid email format.");
+      } else if (error.code === "auth/network-request-failed") {
+        Alert.alert("Network Error", "Please check your internet connection.");
       } else {
         Alert.alert("Signup Failed", error.message);
       }

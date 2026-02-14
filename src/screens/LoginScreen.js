@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,19 +14,57 @@ import {
 import {
   getAuth,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithCredential,
+  signOut,
 } from "@react-native-firebase/auth";
 
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { Ionicons } from "@expo/vector-icons";
+import Svg, { Path } from "react-native-svg";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 👈 added
   const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
 
+  // Google Config
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        "452853908832-sled6oftepvgm1djq102283n3ude68f2.apps.googleusercontent.com",
+      offlineAccess: true,
+    });
+  }, []);
+
+  // Google Logo
+  const GoogleIcon = () => (
+    <Svg width={20} height={20} viewBox="0 0 48 48">
+      <Path
+        fill="#EA4335"
+        d="M24 9.5c3.54 0 6.67 1.22 9.16 3.61l6.83-6.83C35.94 2.24 30.37 0 24 0 14.65 0 6.6 5.48 2.69 13.44l7.98 6.2C12.74 13.05 17.93 9.5 24 9.5z"
+      />
+      <Path
+        fill="#34A853"
+        d="M24 48c6.37 0 11.94-2.24 16.01-6.09l-7.39-6.09c-2.04 1.37-4.65 2.18-8.62 2.18-6.07 0-11.26-3.55-13.33-8.64l-7.98 6.2C6.6 42.52 14.65 48 24 48z"
+      />
+      <Path
+        fill="#4A90E2"
+        d="M48 24c0-1.57-.15-3.09-.42-4.55H24v9.09h13.5c-.58 3.09-2.29 5.7-4.88 7.45l7.39 6.09C44.9 38.23 48 31.71 48 24z"
+      />
+      <Path
+        fill="#FBBC05"
+        d="M10.67 28.36C10.24 27.27 10 25.67 10 24s.24-3.27.67-4.36l-7.98-6.2C1.01 16.96 0 20.38 0 24s1.01 7.04 2.69 10.56l7.98-6.2z"
+      />
+    </Svg>
+  );
+
+  // EMAIL LOGIN
   const handleLogin = async () => {
-    if (!email || !password) {
+    if (!email.trim() || !password.trim()) {
       Alert.alert("Error", "Please enter both Email and Password");
       return;
     }
@@ -34,7 +72,46 @@ const LoginScreen = ({ navigation }) => {
     try {
       setLoading(true);
 
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password,
+      );
+
+      const user = userCredential.user;
+
+      // Refresh user
+      await user.reload();
+
+      // Email verification check
+      if (!user.emailVerified) {
+        await signOut(auth);
+
+        Alert.alert(
+          "Email Not Verified",
+          "Please verify your email before logging in.",
+          [
+            {
+              text: "Resend Verification",
+              onPress: async () => {
+                try {
+                  await user.sendEmailVerification();
+                  Alert.alert(
+                    "Verification Sent",
+                    "A new verification email has been sent.",
+                  );
+                } catch {
+                  Alert.alert("Error", "Failed to resend email.");
+                }
+              },
+            },
+            { text: "OK" },
+          ],
+        );
+
+        setLoading(false);
+        return;
+      }
 
       setLoading(false);
     } catch (error) {
@@ -46,7 +123,7 @@ const LoginScreen = ({ navigation }) => {
       ) {
         Alert.alert(
           "Login Failed",
-          "Please sign in with a valid account or create a new one.",
+          "Account not found. Please create a new account.",
         );
       } else if (error.code === "auth/wrong-password") {
         Alert.alert("Login Failed", "Incorrect password.");
@@ -55,6 +132,27 @@ const LoginScreen = ({ navigation }) => {
       } else {
         Alert.alert("Login Failed", error.message);
       }
+    }
+  };
+
+  // GOOGLE LOGIN
+  const handleGoogleLogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.signOut();
+
+      const userInfo = await GoogleSignin.signIn();
+      const idToken = userInfo.data?.idToken;
+
+      if (!idToken) {
+        Alert.alert("Google Login Failed", "No ID token found");
+        return;
+      }
+
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+      await signInWithCredential(auth, googleCredential);
+    } catch (error) {
+      Alert.alert("Google Login Failed", error.message);
     }
   };
 
@@ -67,7 +165,7 @@ const LoginScreen = ({ navigation }) => {
         style={styles.headerImage}
       />
 
-      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.title}>Welcome to FinSmart</Text>
       <Text style={styles.subtitle}>
         Login to continue managing your income and expenses.
       </Text>
@@ -81,13 +179,23 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setEmail}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+      {/* PASSWORD WITH EYE ICON */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Password"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Ionicons
+            name={showPassword ? "eye-outline" : "eye-off-outline"}
+            size={22}
+            color="#6b7280"
+          />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity
         style={styles.button}
@@ -101,33 +209,30 @@ const LoginScreen = ({ navigation }) => {
         )}
       </TouchableOpacity>
 
-      {/* Divider */}
       <View style={styles.divider}>
         <View style={styles.line} />
         <Text style={styles.orText}>OR</Text>
         <View style={styles.line} />
       </View>
 
-      {/* Social Buttons */}
       <View style={styles.socialRow}>
         <TouchableOpacity
           style={[styles.socialButton, styles.googleButton]}
-          onPress={() => Alert.alert("Info", "Google Login coming soon!")}
+          onPress={handleGoogleLogin}
         >
-          <FontAwesome name="google" size={18} color="#db4437" />
+          <GoogleIcon />
           <Text style={styles.googleText}> Continue with Google</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.socialButton, styles.phoneButton]}
-          onPress={() => Alert.alert("Info", "Phone Login coming soon!")}
+          onPress={() => navigation.navigate("PhoneLogin")}
         >
           <Ionicons name="call-outline" size={18} color="#fff" />
           <Text style={styles.phoneText}> Login with Phone</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Signup */}
       <View style={styles.signupContainer}>
         <Text style={styles.signupText}>Don’t have an account?</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
@@ -176,6 +281,23 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: "#f9fafb",
   },
+
+  passwordContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 12,
+    backgroundColor: "#f9fafb",
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    height: 55,
+  },
+  passwordInput: {
+    flex: 1,
+  },
+
   button: {
     backgroundColor: "#2e7d32",
     width: "100%",
@@ -184,13 +306,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 5,
-    elevation: 3,
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    letterSpacing: 1,
   },
   divider: {
     flexDirection: "row",
@@ -256,8 +376,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   headerImage: {
-    width: 280,
-    height: 150,
+    width: 300,
+    height: 200,
     resizeMode: "contain",
     marginVertical: 10,
   },

@@ -68,13 +68,12 @@ const Home = ({ navigation }) => {
               { color: isDarkMode ? "#94a3b8" : "#6b7280" },
             ]}
           >
-            {user.email}
           </Text>
         )}
 
         <Text
           style={[
-            tailwind`text-base mt-1`,
+            tailwind`text-base`,
             { color: isDarkMode ? "#94a3b8" : "#6b7280" },
           ]}
         >

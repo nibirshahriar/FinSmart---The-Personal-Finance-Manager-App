@@ -54,7 +54,9 @@ const Profile = () => {
         <View style={tailwind`items-center mb-6`}>
           <Image
             source={{
-              uri: user?.photoURL || "https://i.pravatar.cc/150?img=12",
+              uri:
+                user?.photoURL ||
+                "https://img.icons8.com/color/150/user-male-circle--v1.png",
             }}
             style={tailwind`w-24 h-24 rounded-full mb-3`}
           />
