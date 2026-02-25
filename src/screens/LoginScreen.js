@@ -22,11 +22,12 @@ import {
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Path } from "react-native-svg";
+import { sendEmailVerification } from "firebase/auth";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👈 added
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
@@ -95,12 +96,14 @@ const LoginScreen = ({ navigation }) => {
               text: "Resend Verification",
               onPress: async () => {
                 try {
-                  await user.sendEmailVerification();
-                  Alert.alert(
-                    "Verification Sent",
-                    "A new verification email has been sent.",
-                  );
-                } catch {
+                  if (user) {
+                    await sendEmailVerification(user);
+                    Alert.alert(
+                      "Verification Sent",
+                      "A new verification email has been sent.",
+                    );
+                  }
+                } catch (error) {
                   Alert.alert("Error", "Failed to resend email.");
                 }
               },
@@ -158,7 +161,14 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.logo}>FinSmart</Text>
+      <View style={styles.logoContainer}>
+        <Image
+          source={require("../../assets/icon.png")}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.logoText}>FinSmart</Text>
+      </View>
 
       <Image
         source={require("../../assets/chat.png")}
@@ -253,9 +263,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
-  logo: {
-    fontSize: 45,
-    fontWeight: "bold",
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  logoImage: {
+    width: 60,
+    height: 60,
+    marginRight: 4,
+  },
+
+  logoText: {
+    fontSize: 48,
+    fontWeight: "900",
     color: "#1f2937",
   },
   title: {

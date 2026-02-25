@@ -20,7 +20,7 @@ const PhoneLoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
 
-  // ================= FORMAT PHONE =================
+  // FORMAT PHONE 
   const formatPhoneNumber = (number) => {
     if (number.startsWith("0")) {
       return "+880" + number.substring(1);
@@ -31,7 +31,7 @@ const PhoneLoginScreen = ({ navigation }) => {
     return number;
   };
 
-  // ================= SEND OTP =================
+  //  SEND OTP 
   const sendOTP = async () => {
     if (!phone.trim()) {
       Alert.alert("Error", "Enter phone number");
@@ -58,7 +58,7 @@ const PhoneLoginScreen = ({ navigation }) => {
     }
   };
 
-  // ================= VERIFY OTP =================
+  // VERIFY OTP
   const verifyOTP = async () => {
     if (!code.trim()) {
       Alert.alert("Error", "Enter verification code");

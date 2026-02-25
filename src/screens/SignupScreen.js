@@ -8,11 +8,11 @@ import {
   ScrollView,
   ActivityIndicator,
   View,
-} from "react-native";
-
+} from "react-native"; 
 import {
   getAuth,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   signOut,
 } from "@react-native-firebase/auth";
 
@@ -21,6 +21,7 @@ const SignupScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Initialize auth (modular style)
   const auth = getAuth();
 
   const handleSignup = async () => {
@@ -32,7 +33,7 @@ const SignupScreen = ({ navigation }) => {
     try {
       setLoading(true);
 
-      //Create account
+      // Create new account
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email.trim(),
@@ -41,10 +42,10 @@ const SignupScreen = ({ navigation }) => {
 
       const user = userCredential.user;
 
-      //Send verification email
-      await user.sendEmailVerification();
+      // Send verification email (NEW modular method)
+      await sendEmailVerification(user);
 
-      //Force logout immediately (cannot enter Home without verify)
+      // Force logout so user cannot access app before verification
       await signOut(auth);
 
       setLoading(false);
@@ -62,6 +63,7 @@ const SignupScreen = ({ navigation }) => {
     } catch (error) {
       setLoading(false);
 
+      //Friendly error handling
       if (error.code === "auth/email-already-in-use") {
         Alert.alert("Error", "This email is already registered.");
       } else if (error.code === "auth/weak-password") {
@@ -80,6 +82,7 @@ const SignupScreen = ({ navigation }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Create Account</Text>
 
+      {/* Email Input */}
       <TextInput
         style={styles.input}
         placeholder="Email Address"
@@ -89,6 +92,7 @@ const SignupScreen = ({ navigation }) => {
         onChangeText={setEmail}
       />
 
+      {/* Password Input */}
       <TextInput
         style={styles.input}
         placeholder="Password (min 6 characters)"
@@ -97,6 +101,7 @@ const SignupScreen = ({ navigation }) => {
         onChangeText={setPassword}
       />
 
+      {/* Signup Button */}
       <TouchableOpacity
         style={styles.button}
         onPress={handleSignup}
@@ -109,6 +114,7 @@ const SignupScreen = ({ navigation }) => {
         )}
       </TouchableOpacity>
 
+      {/* Login Redirect */}
       <View style={styles.loginContainer}>
         <Text style={styles.loginText}>Already have an account?</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>

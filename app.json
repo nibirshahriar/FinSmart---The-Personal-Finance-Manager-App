@@ -4,7 +4,7 @@
     "slug": "finsmart",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon3.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -25,7 +25,7 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/icon3.png",
+      "favicon": "./assets/icon.png",
       "name": "FinSmart",
       "shortName": "FinSmart"
     },

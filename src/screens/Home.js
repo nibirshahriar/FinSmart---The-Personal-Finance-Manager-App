@@ -67,8 +67,7 @@ const Home = ({ navigation }) => {
               tailwind`text-sm mt-1`,
               { color: isDarkMode ? "#94a3b8" : "#6b7280" },
             ]}
-          >
-          </Text>
+          ></Text>
         )}
 
         <Text
@@ -77,7 +76,7 @@ const Home = ({ navigation }) => {
             { color: isDarkMode ? "#94a3b8" : "#6b7280" },
           ]}
         >
-          Start tracking your expenses wisely
+          Start tracking your income and expenses wisely
         </Text>
       </View>
 
