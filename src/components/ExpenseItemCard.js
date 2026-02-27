@@ -8,10 +8,13 @@ const ExpenseItemCard = ({ item }) => {
   const { deleteExpense } = useExpenses();
   const { isDarkMode } = useTheme();
 
+  // Detect income or expense
+  const isIncome = item.type === "income";
+
   const handleDelete = () => {
     Alert.alert(
-      "Delete Expense",
-      "Are you sure you want to delete this expense?",
+      "Delete Transaction",
+      "Are you sure you want to delete this transaction?",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -22,9 +25,10 @@ const ExpenseItemCard = ({ item }) => {
       ],
     );
   };
-  //1.title,
+
+  // 1.title
   // 2.icon
-  // , 3.category
+  // 3.category
   // 4.amount and date
 
   return (
@@ -33,23 +37,29 @@ const ExpenseItemCard = ({ item }) => {
       style={[
         tailwind`rounded-2xl p-4 mx-5 mb-3 flex-row justify-between items-center`,
         {
-          backgroundColor: isDarkMode ? "#0f172a" : "#f8fafc",
+          backgroundColor: isDarkMode ? "#0f172a" : "#ffffff",
           borderWidth: 1,
           borderColor: isDarkMode ? "#1e293b" : "#e5e7eb",
+          borderLeftWidth: 6, // Left indicator
+          borderLeftColor: isIncome ? "#16a34a" : "#dc2626", // Green or Red
           shadowColor: "#000",
-          shadowOpacity: isDarkMode ? 0.35 : 0.12,
-          shadowRadius: 8,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: isDarkMode ? 5 : 3,
+          shadowOpacity: isDarkMode ? 0.4 : 0.1,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 5 },
+          elevation: 4,
         },
       ]}
     >
+      {/* LEFT SECTION */}
       <View style={tailwind`flex-row items-center`}>
+        {/* Icon Box */}
         <View
           style={[
             tailwind`w-12 h-12 rounded-xl justify-center items-center mr-4`,
             {
-              backgroundColor: isDarkMode ? "#1e293b" : "#e5e7eb",
+              backgroundColor: isIncome
+                ? "rgba(22,163,74,0.15)"
+                : "rgba(220,38,38,0.15)",
             },
           ]}
         >
@@ -57,6 +67,7 @@ const ExpenseItemCard = ({ item }) => {
         </View>
 
         <View>
+          {/* Title */}
           <Text
             style={[
               tailwind`text-base font-semibold`,
@@ -66,29 +77,33 @@ const ExpenseItemCard = ({ item }) => {
             {item.title}
           </Text>
 
-          {/* category */}
+          {/* Category Badge */}
           <View
             style={[
               tailwind`mt-1 px-2 py-1 rounded-xl self-start`,
-              { backgroundColor: item.color },
+              { backgroundColor: isIncome ? "#16a34a" : item.color },
             ]}
           >
             <Text style={tailwind`text-xs font-bold text-white`}>
-              {item.category}
+              {isIncome ? "Income" : item.category}
             </Text>
           </View>
         </View>
       </View>
 
+      {/* RIGHT SECTION */}
       <View style={tailwind`items-end`}>
+        {/* Amount */}
         <Text
           style={[
             tailwind`text-base font-bold`,
-            { color: isDarkMode ? "#f8fafc" : "#020617" },
+            { color: isIncome ? "#16a34a" : "#dc2626" },
           ]}
         >
-          Tk.{item.amount}
+          {isIncome ? "+" : "-"} Tk.{item.amount}
         </Text>
+
+        {/* Date */}
         <Text
           style={[
             tailwind`text-xs mt-1`,

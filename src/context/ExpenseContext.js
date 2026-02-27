@@ -1,3 +1,5 @@
+// ExpenseContext.js
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getCategoryColor, getDate } from "../helper";
 
@@ -25,7 +27,9 @@ export function ExpenseProvider({ children }) {
   const auth = getAuth();
   const db = getFirestore();
 
-  // ✅ Listen to Auth + Firestore (MODERN WAY)
+  // ==========================================
+  // ✅ Listen to Auth + Firestore (REALTIME)
+  // ==========================================
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -57,22 +61,37 @@ export function ExpenseProvider({ children }) {
     return unsubscribeAuth;
   }, []);
 
-  // ✅ Add Expense
+  // ==========================================
+  // ✅ Add Expense / Income
+  // ==========================================
   const addExpense = async (expense) => {
     const user = auth.currentUser;
     if (!user) return;
 
     const expensesRef = collection(db, "users", user.uid, "expenses");
 
+    // Base object (common for both income & expense)
     const newExpense = {
       title: expense.title,
       amount: Number(expense.amount),
-      category: expense.category.name,
+      type: expense.type, // 🔥 IMPORTANT (income / expense)
       date: getDate(),
-      color: getCategoryColor(expense.category.color),
-      icon: expense.category.icon,
       createdAt: serverTimestamp(),
     };
+
+    // If Expense → store category data
+    if (expense.type === "expense" && expense.category) {
+      newExpense.category = expense.category.name;
+      newExpense.color = getCategoryColor(expense.category.color);
+      newExpense.icon = expense.category.icon;
+    }
+
+    // If Income → store default values
+    if (expense.type === "income") {
+      newExpense.category = "Income";
+      newExpense.color = "#16a34a";
+      newExpense.icon = "💰";
+    }
 
     try {
       await addDoc(expensesRef, newExpense);
@@ -81,7 +100,9 @@ export function ExpenseProvider({ children }) {
     }
   };
 
-  // ✅ Delete Expense
+  // ==========================================
+  // ✅ Delete Single Expense
+  // ==========================================
   const deleteExpense = async (id) => {
     const user = auth.currentUser;
     if (!user) return;
@@ -93,7 +114,9 @@ export function ExpenseProvider({ children }) {
     }
   };
 
-  // ✅ Clear All
+  // ==========================================
+  // ✅ Clear All Expenses
+  // ==========================================
   const clearAllExpenses = async () => {
     const user = auth.currentUser;
     if (!user) return;

@@ -19,19 +19,26 @@ const Create = ({ navigation, route }) => {
   const [amount, setAmount] = useState("");
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState(null);
+  const [type, setType] = useState("expense"); // default expense
 
-  // receive selected category from Category screen
   useEffect(() => {
     if (route.params?.category) {
       setCategory(route.params.category);
     }
   }, [route.params?.category]);
 
-  const handleAddExpense = () => {
+  const handleSubmit = () => {
     const numericAmount = Number(amount);
 
-    if (!amount || !title || !category) {
-      Alert.alert("Error", "All fields are required");
+    // Validation
+    if (!amount || !title) {
+      Alert.alert("Error", "Amount and Title are required");
+      return;
+    }
+
+    // Only require category for expense
+    if (type === "expense" && !category) {
+      Alert.alert("Error", "Please select a category");
       return;
     }
 
@@ -40,25 +47,27 @@ const Create = ({ navigation, route }) => {
       return;
     }
 
-    // add expense to context
     addExpense({
       title,
       amount: numericAmount,
-      category,
+      category: type === "expense" ? category : null,
+      type,
     });
 
-    // reset form
+    // Reset
     setAmount("");
     setTitle("");
     setCategory(null);
+    setType("expense");
 
-    // go back
     navigation.goBack();
   };
 
   const handleCategoryInput = () => {
     navigation.navigate("Category");
   };
+
+  const buttonColor = type === "expense" ? "bg-rose-600" : "bg-emerald-600";
 
   return (
     <View
@@ -68,6 +77,33 @@ const Create = ({ navigation, route }) => {
       ]}
     >
       <ScrollView contentContainerStyle={tailwind`p-6`}>
+        {/* Toggle */}
+        <View style={tailwind`flex-row mb-8 rounded-xl overflow-hidden`}>
+          <Pressable
+            onPress={() => setType("expense")}
+            style={[
+              tailwind`flex-1 p-4 items-center`,
+              {
+                backgroundColor: type === "expense" ? "#e11d48" : "#334155",
+              },
+            ]}
+          >
+            <Text style={tailwind`text-white font-bold`}>Expense</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => setType("income")}
+            style={[
+              tailwind`flex-1 p-4 items-center`,
+              {
+                backgroundColor: type === "income" ? "#059669" : "#334155",
+              },
+            ]}
+          >
+            <Text style={tailwind`text-white font-bold`}>Income</Text>
+          </Pressable>
+        </View>
+
         {/* Header */}
         <Text
           style={[
@@ -75,7 +111,7 @@ const Create = ({ navigation, route }) => {
             { color: isDarkMode ? "#fff" : "#000" },
           ]}
         >
-          Create New Expense
+          Add {type === "expense" ? "Expense" : "Income"}
         </Text>
 
         <Text
@@ -84,7 +120,7 @@ const Create = ({ navigation, route }) => {
             { color: isDarkMode ? "#94a3b8" : "#6b7280" },
           ]}
         >
-          Enter the details of your expenses
+          Enter transaction details
         </Text>
 
         {/* Amount */}
@@ -95,7 +131,7 @@ const Create = ({ navigation, route }) => {
               { color: isDarkMode ? "#cbd5f5" : "#374151" },
             ]}
           >
-            Enter Amount
+            Amount
           </Text>
 
           <TextInput
@@ -109,7 +145,7 @@ const Create = ({ navigation, route }) => {
               {
                 backgroundColor: isDarkMode ? "#020617" : "#fff",
                 color: isDarkMode ? "#fff" : "#000",
-                borderColor: isDarkMode ? "#334155" : "#22c55e",
+                borderColor: type === "expense" ? "#e11d48" : "#059669",
               },
             ]}
           />
@@ -142,57 +178,54 @@ const Create = ({ navigation, route }) => {
           />
         </View>
 
-        {/* Category */}
-        <View style={tailwind`mb-5`}>
-          <Text
-            style={[
-              tailwind`text-lg font-semibold mb-2`,
-              { color: isDarkMode ? "#cbd5f5" : "#374151" },
-            ]}
-          >
-            Category
-          </Text>
+        {/* Category (Only for Expense) */}
+        {type === "expense" && (
+          <View style={tailwind`mb-5`}>
+            <Text
+              style={[
+                tailwind`text-lg font-semibold mb-2`,
+                { color: isDarkMode ? "#cbd5f5" : "#374151" },
+              ]}
+            >
+              Category
+            </Text>
 
-          <Pressable
-            onPress={handleCategoryInput}
-            style={[
-              tailwind`border p-4 rounded-xl flex-row justify-between items-center`,
-              {
-                backgroundColor: isDarkMode ? "#020617" : "#fff",
-                borderColor: isDarkMode ? "#334155" : "#9ca3af",
-              },
-            ]}
-          >
-            <View style={tailwind`flex-row items-center`}>
-              <Text
-                style={[
-                  tailwind`text-2xl mr-3`,
-                  { color: isDarkMode ? "#fff" : "#000" },
-                ]}
-              >
-                {category ? category.icon : "☰"}
-              </Text>
+            <Pressable
+              onPress={handleCategoryInput}
+              style={[
+                tailwind`border p-4 rounded-xl flex-row justify-between items-center`,
+                {
+                  backgroundColor: isDarkMode ? "#020617" : "#fff",
+                  borderColor: isDarkMode ? "#334155" : "#9ca3af",
+                },
+              ]}
+            >
+              <View style={tailwind`flex-row items-center`}>
+                <Text style={tailwind`text-2xl mr-3`}>
+                  {category ? category.icon : "☰"}
+                </Text>
 
-              <Text
-                style={[
-                  tailwind`text-lg`,
-                  { color: isDarkMode ? "#e5e7eb" : "#000" },
-                ]}
-              >
-                {category ? category.name : "Select Category"}
-              </Text>
-            </View>
-            <Text style={tailwind`text-2xl`}>&gt;</Text>
-          </Pressable>
-        </View>
+                <Text
+                  style={[
+                    tailwind`text-lg`,
+                    { color: isDarkMode ? "#e5e7eb" : "#000" },
+                  ]}
+                >
+                  {category ? category.name : "Select Category"}
+                </Text>
+              </View>
+              <Text style={tailwind`text-2xl`}>&gt;</Text>
+            </Pressable>
+          </View>
+        )}
 
         {/* Submit Button */}
         <Pressable
-          style={tailwind`bg-rose-600 p-6 rounded-xl mt-8`}
-          onPress={handleAddExpense}
+          style={tailwind`${buttonColor} p-6 rounded-xl mt-8`}
+          onPress={handleSubmit}
         >
           <Text style={tailwind`text-white text-center text-lg font-bold`}>
-            Add Expense
+            Add {type === "expense" ? "Expense" : "Income"}
           </Text>
         </Pressable>
       </ScrollView>
