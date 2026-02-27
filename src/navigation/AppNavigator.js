@@ -12,10 +12,7 @@ import Profile from "../screens/Profile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-
-// ==========================================
 // Bottom Tabs
-// ==========================================
 function MyTabs() {
   const { isDarkMode } = useTheme();
 
@@ -62,9 +59,7 @@ function MyTabs() {
   );
 }
 
-// ==========================================
 // Stack Navigator
-// ==========================================
 export default function AppNavigator() {
   const { isDarkMode } = useTheme();
 
@@ -80,16 +75,11 @@ export default function AppNavigator() {
           name="FinSmart"
           component={MyTabs}
           options={{
-            // Header Background
             headerStyle: {
               backgroundColor: isDarkMode ? "#0f172a" : "#ffffff",
-              height: 80, // ✅ Proper balanced height
+              height: 80,
             },
-
-            // Title Color
             headerTintColor: isDarkMode ? "#ffffff" : "#0f172a",
-
-            // Title Styling
             headerTitleStyle: {
               fontSize: 22,
               fontWeight: "800",
@@ -97,8 +87,6 @@ export default function AppNavigator() {
             },
 
             headerTitleAlign: "center",
-
-            // Remove shadow for clean fintech look
             headerShadowVisible: false,
           }}
         />

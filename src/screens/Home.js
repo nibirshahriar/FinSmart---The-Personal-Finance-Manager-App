@@ -17,38 +17,20 @@ import { useTheme } from "../context/ThemeContext";
 const Home = ({ navigation }) => {
   const { expenses, clearAllExpenses } = useExpenses();
   const { isDarkMode } = useTheme();
-
-  // =========================================
+ 
   // FILTER STATE (all / today / week / month)
-  // =========================================
-  const [filter, setFilter] = useState("all");
-
-  // =========================================
-  // CALENDAR BASED FILTER LOGIC
-  // =========================================
+   const [filter, setFilter] = useState("all");
   const filteredTransactions = expenses.filter((item) => {
     if (!item.createdAt?.seconds) return false;
 
     const transactionDate = new Date(item.createdAt.seconds * 1000);
 
     const now = new Date();
-
-    // ------------------------------
-    // ALL
-    // ------------------------------
-    if (filter === "all") return true;
-
-    // ------------------------------
-    // TODAY
-    // ------------------------------
-    if (filter === "today") {
+     if (filter === "all") return true;
+     if (filter === "today") {
       return transactionDate.toDateString() === now.toDateString();
     }
-
-    // ------------------------------
-    // THIS WEEK (Mon–Sun)
-    // ------------------------------
-    if (filter === "week") {
+     if (filter === "week") {
       const firstDayOfWeek = new Date(now);
       const day = now.getDay();
       const diff = now.getDate() - day + (day === 0 ? -6 : 1);
@@ -57,38 +39,22 @@ const Home = ({ navigation }) => {
 
       return transactionDate >= firstDayOfWeek;
     }
-
-    // ------------------------------
-    // THIS MONTH (1st to today)
-    // ------------------------------
-    if (filter === "month") {
+     if (filter === "month") {
       const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       return transactionDate >= firstDayOfMonth;
     }
 
     return true;
   });
-
-  // =========================================
-  // TOTAL EXPENSE
-  // =========================================
-  const totalSpent = expenses
+   const totalSpent = expenses
     .filter((item) => item.type === "expense")
     .reduce((sum, item) => sum + Number(item.amount), 0);
-
-  // =========================================
-  // TOTAL INCOME
-  // =========================================
-  const totalIncome = expenses
+   const totalIncome = expenses
     .filter((item) => item.type === "income")
     .reduce((sum, item) => sum + Number(item.amount), 0);
 
   const currentBalance = totalIncome - totalSpent;
-
-  // =========================================
-  // CLEAR ALL
-  // =========================================
-  const handleClearAll = () => {
+   const handleClearAll = () => {
     Alert.alert(
       "Clear All Transactions",
       "Are you sure you want to delete all transactions?",
@@ -130,7 +96,6 @@ const Home = ({ navigation }) => {
         { backgroundColor: isDarkMode ? "#020617" : "#ffffff" },
       ]}
     >
-      {/* ================= BALANCE CARD ================= */}
       <View
         style={[
           tailwind`rounded-3xl p-6 mx-5 my-4`,
@@ -163,8 +128,6 @@ const Home = ({ navigation }) => {
           </View>
         </View>
       </View>
-
-      {/* ================= TITLE ================= */}
       <Text
         style={[
           tailwind`text-xl font-bold mx-5`,
@@ -173,8 +136,6 @@ const Home = ({ navigation }) => {
       >
         Transactions
       </Text>
-
-      {/* ================= FILTER BUTTONS ================= */}
       <View style={tailwind`flex-row mx-5 mt-3 mb-2`}>
         {[
           { key: "all", label: "All" },
@@ -208,7 +169,7 @@ const Home = ({ navigation }) => {
         ))}
       </View>
 
-      {/* ================= TRANSACTION LIST ================= */}
+      {/*TRANSACTION LIST*/}
       <FlatList
         data={filteredTransactions}
         renderItem={({ item }) => <ExpenseItemCard item={item} />}

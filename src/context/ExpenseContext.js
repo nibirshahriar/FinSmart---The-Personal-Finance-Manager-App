@@ -1,5 +1,3 @@
-// ExpenseContext.js
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getCategoryColor, getDate } from "../helper";
 
@@ -27,9 +25,7 @@ export function ExpenseProvider({ children }) {
   const auth = getAuth();
   const db = getFirestore();
 
-  // ==========================================
-  // ✅ Listen to Auth + Firestore (REALTIME)
-  // ==========================================
+  //Listen to Auth + Firestore (REALTIME)
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -61,9 +57,7 @@ export function ExpenseProvider({ children }) {
     return unsubscribeAuth;
   }, []);
 
-  // ==========================================
-  // ✅ Add Expense / Income
-  // ==========================================
+  // Add Expense / Income
   const addExpense = async (expense) => {
     const user = auth.currentUser;
     if (!user) return;
@@ -74,7 +68,7 @@ export function ExpenseProvider({ children }) {
     const newExpense = {
       title: expense.title,
       amount: Number(expense.amount),
-      type: expense.type, // 🔥 IMPORTANT (income / expense)
+      type: expense.type,
       date: getDate(),
       createdAt: serverTimestamp(),
     };
@@ -100,9 +94,7 @@ export function ExpenseProvider({ children }) {
     }
   };
 
-  // ==========================================
-  // ✅ Delete Single Expense
-  // ==========================================
+  //Delete Single Expense
   const deleteExpense = async (id) => {
     const user = auth.currentUser;
     if (!user) return;
@@ -114,9 +106,7 @@ export function ExpenseProvider({ children }) {
     }
   };
 
-  // ==========================================
-  // ✅ Clear All Expenses
-  // ==========================================
+  //Clear All Expenses
   const clearAllExpenses = async () => {
     const user = auth.currentUser;
     if (!user) return;
