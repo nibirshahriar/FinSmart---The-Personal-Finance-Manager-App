@@ -11,6 +11,8 @@ import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import AppNavigator from "./src/navigation/AppNavigator";
 import AuthNavigator from "./src/navigation/AuthNavigator";
 
+import { TourProvider } from "./src/context/TourContext";
+
 const Root = () => {
   const [user, setUser] = useState(undefined);
   const { isDarkMode } = useTheme();
@@ -49,7 +51,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <ExpenseProvider>
-        <Root />
+        <TourProvider>
+          <Root />
+        </TourProvider>
       </ExpenseProvider>
     </ThemeProvider>
   );

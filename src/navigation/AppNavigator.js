@@ -1,3 +1,4 @@
+//import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "react-native";
@@ -9,9 +10,13 @@ import Create from "../screens/Create";
 import Insights from "../screens/Insights";
 import Category from "../screens/Category";
 import Profile from "../screens/Profile";
+import TourList from "../screens/TourList";
+import TourDetails from "../screens/TourDetails";
+import TourSummary from "../screens/TourSummary";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+
 // Bottom Tabs
 function MyTabs() {
   const { isDarkMode } = useTheme();
@@ -85,12 +90,34 @@ export default function AppNavigator() {
               fontWeight: "800",
               letterSpacing: 1,
             },
-
             headerTitleAlign: "center",
             headerShadowVisible: false,
           }}
         />
 
+        {/* Tour List Screen */}
+        <Stack.Screen
+          name="TourList"
+          component={TourList}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        {/* Tour Details Screen */}
+        <Stack.Screen
+          name="TourDetails"
+          component={TourDetails}
+          options={{
+            headerShown: false,
+          }}
+        />
+        {/* Tour Summmary */}
+        <Stack.Screen
+          name="TourSummary"
+          component={TourSummary}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Category"
           component={Category}

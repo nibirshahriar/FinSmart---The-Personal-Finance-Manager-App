@@ -17,44 +17,56 @@ import { useTheme } from "../context/ThemeContext";
 const Home = ({ navigation }) => {
   const { expenses, clearAllExpenses } = useExpenses();
   const { isDarkMode } = useTheme();
- 
-  // FILTER STATE (all / today / week / month)
-   const [filter, setFilter] = useState("all");
-  const filteredTransactions = expenses.filter((item) => {
-    if (!item.createdAt?.seconds) return false;
 
-    const transactionDate = new Date(item.createdAt.seconds * 1000);
+  // FILTER STATE (all / today / week / month / year)
+  const [filter, setFilter] = useState("all");
 
-    const now = new Date();
-     if (filter === "all") return true;
-     if (filter === "today") {
-      return transactionDate.toDateString() === now.toDateString();
-    }
-     if (filter === "week") {
-      const firstDayOfWeek = new Date(now);
-      const day = now.getDay();
-      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      firstDayOfWeek.setDate(diff);
-      firstDayOfWeek.setHours(0, 0, 0, 0);
+  const filteredTransactions = expenses
+    .filter((item) => {
+      if (!item.createdAt?.seconds) return false;
 
-      return transactionDate >= firstDayOfWeek;
-    }
-     if (filter === "month") {
-      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      return transactionDate >= firstDayOfMonth;
-    }
+      const transactionDate = new Date(item.createdAt.seconds * 1000);
+      const now = new Date();
 
-    return true;
-  });
-   const totalSpent = expenses
+      if (filter === "all") return true;
+
+      if (filter === "today") {
+        return transactionDate.toDateString() === now.toDateString();
+      }
+
+      if (filter === "week") {
+        const firstDayOfWeek = new Date(now);
+        firstDayOfWeek.setDate(now.getDate() - now.getDay());
+        firstDayOfWeek.setHours(0, 0, 0, 0);
+
+        return transactionDate >= firstDayOfWeek;
+      }
+
+      if (filter === "month") {
+        const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        return transactionDate >= firstDayOfMonth;
+      }
+
+      if (filter === "year") {
+        const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
+        return transactionDate >= firstDayOfYear;
+      }
+
+      return true;
+    })
+    .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+
+  const totalSpent = filteredTransactions
     .filter((item) => item.type === "expense")
     .reduce((sum, item) => sum + Number(item.amount), 0);
-   const totalIncome = expenses
+
+  const totalIncome = filteredTransactions
     .filter((item) => item.type === "income")
     .reduce((sum, item) => sum + Number(item.amount), 0);
 
   const currentBalance = totalIncome - totalSpent;
-   const handleClearAll = () => {
+
+  const handleClearAll = () => {
     Alert.alert(
       "Clear All Transactions",
       "Are you sure you want to delete all transactions?",
@@ -67,26 +79,6 @@ const Home = ({ navigation }) => {
         },
       ],
     );
-    const clearWeekly = () => {
-      const now = new Date();
-      const firstDayOfWeek = new Date(
-        now.setDate(now.getDate() - now.getDay()),
-      );
-
-      Alert.alert("Clear This Week", "Delete this week's transactions?", [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            const filtered = expenses.filter(
-              (item) => new Date(item.date) < firstDayOfWeek,
-            );
-            setExpenses(filtered);
-          },
-        },
-      ]);
-    };
   };
 
   return (
@@ -128,6 +120,7 @@ const Home = ({ navigation }) => {
           </View>
         </View>
       </View>
+
       <Text
         style={[
           tailwind`text-xl font-bold mx-5`,
@@ -136,12 +129,14 @@ const Home = ({ navigation }) => {
       >
         Transactions
       </Text>
+
       <View style={tailwind`flex-row mx-5 mt-3 mb-2`}>
         {[
           { key: "all", label: "All" },
           { key: "today", label: "Today" },
-          { key: "week", label: "This Week" },
-          { key: "month", label: "This Month" },
+          { key: "week", label: "Week" },
+          { key: "month", label: "Month" },
+          { key: "year", label: "Year" },
         ].map((item) => (
           <Pressable
             key={item.key}
