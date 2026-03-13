@@ -1,4 +1,15 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
+import { Alert } from "react-native";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "@react-native-firebase/firestore";
+import uuid from "react-native-uuid";
 
 const TourContext = createContext();
 
@@ -6,6 +17,58 @@ export const useTour = () => useContext(TourContext);
 
 export const TourProvider = ({ children }) => {
   const [tours, setTours] = useState([]);
+
+  const auth = getAuth();
+  const db = getFirestore();
+
+  useEffect(() => {
+    let unsubscribeSnapshot = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+        unsubscribeSnapshot = null;
+      }
+
+      if (!user) {
+        setTours([]);
+        return;
+      }
+
+      const toursRef = collection(db, "users", user.uid, "tours");
+
+      unsubscribeSnapshot = onSnapshot(
+        toursRef,
+        (snapshot) => {
+          if (!snapshot || !snapshot.docs) {
+            setTours([]);
+            return;
+          }
+
+          const data = snapshot.docs.map((docItem) => ({
+            id: docItem.id,
+            ...docItem.data(),
+          }));
+
+          setTours(data);
+        },
+        (error) => {
+          if (
+            error?.code !== "firestore/permission-denied" &&
+            error?.code !== "permission-denied"
+          ) {
+            console.log("Snapshot error:", error);
+          }
+          setTours([]);
+        },
+      );
+    });
+
+    return () => {
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
+      unsubscribeAuth();
+    };
+  }, []);
 
   const addTour = (tour) => {
     const newTour = {
@@ -20,131 +83,179 @@ export const TourProvider = ({ children }) => {
     setTours((prev) => [...prev, newTour]);
   };
 
-  const deleteTour = (tourId) => {
-    setTours((prev) => prev.filter((tour) => tour.id !== tourId));
+  const deleteTour = async (tourId) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await deleteDoc(doc(db, "users", user.uid, "tours", tourId));
   };
 
-  const addMember = (tourId, memberName) => {
+  const addMember = async (tourId, memberName) => {
     if (!memberName) return;
 
-    setTours((prev) =>
-      prev.map((tour) => {
-        if (tour.id !== tourId) return tour;
+    const tour = tours.find((t) => t.id === tourId);
+    if (!tour) return;
 
-        const updatedMembers = [
-          ...tour.members,
-          {
-            id: Date.now().toString(),
-            name: memberName,
-            paid: 0,
-          },
-        ];
+    if (
+      tour.members?.some(
+        (m) => m.name.toLowerCase() === memberName.toLowerCase(),
+      )
+    ) {
+      Alert.alert("Duplicate Member", `${memberName} already exists`);
+      return;
+    }
 
-        return {
-          ...tour,
-          members: updatedMembers,
-        };
-      }),
-    );
+    const updatedMembers = [
+      ...(tour.members || []),
+      {
+        id: uuid.v4(),
+        name: memberName,
+        paid: 0,
+      },
+    ];
+
+    const totalExpense = tour.totalExpense || 0;
+    const memberCount = updatedMembers.length;
+
+    const perPerson =
+      memberCount > 0 ? Math.ceil(totalExpense / memberCount) : 0;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await updateDoc(doc(db, "users", user.uid, "tours", tourId), {
+      members: updatedMembers,
+      perPerson,
+    });
   };
 
-  const addTourExpense = (tourId, expense) => {
-    if (!expense || !expense.amount) return;
+  const addTourExpense = async (tourId, expense) => {
+    const tour = tours.find((t) => t.id === tourId);
+    if (!tour) return;
 
-    setTours((prev) =>
-      prev.map((tour) => {
-        if (tour.id !== tourId) return tour;
+    const updatedExpenses = [
+      ...(tour.expenses || []),
+      {
+        ...expense,
+        id: uuid.v4(),
+      },
+    ];
 
-        const updatedExpenses = [...tour.expenses, expense];
-
-        const totalExpense = updatedExpenses.reduce(
-          (sum, item) => sum + item.amount,
-          0,
-        );
-
-        const memberCount = tour.members.length || tour.participants || 1;
-
-        const perPerson =
-          memberCount > 0 ? Math.ceil(totalExpense / memberCount) : 0;
-
-        return {
-          ...tour,
-          expenses: updatedExpenses,
-          totalExpense,
-          perPerson,
-        };
-      }),
+    const totalExpense = updatedExpenses.reduce(
+      (sum, item) => sum + item.amount,
+      0,
     );
+
+    const memberCount = tour.members?.length || 0;
+
+    const perPerson =
+      memberCount > 0 ? Math.ceil(totalExpense / memberCount) : 0;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await updateDoc(doc(db, "users", user.uid, "tours", tourId), {
+      expenses: updatedExpenses,
+      totalExpense,
+      perPerson,
+    });
   };
 
-  const updateMemberPaid = (tourId, memberId, amount) => {
-    if (!amount) return;
+  const updateMemberPaid = async (tourId, memberId, amount) => {
+    const tour = tours.find((t) => t.id === tourId);
+    if (!tour) return;
 
-    setTours((prev) =>
-      prev.map((tour) =>
-        tour.id === tourId
-          ? {
-              ...tour,
-              members: tour.members.map((m) =>
-                m.id === memberId ? { ...m, paid: m.paid + amount } : m,
-              ),
-            }
-          : tour,
-      ),
+    const updatedMembers = tour.members.map((m) =>
+      m.id === memberId ? { ...m, paid: m.paid + amount } : m,
     );
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await updateDoc(doc(db, "users", user.uid, "tours", tourId), {
+      members: updatedMembers,
+    });
+  };
+
+  const settlePayment = async (tourId, fromName, toName, amount) => {
+    const tour = tours.find((t) => t.id === tourId);
+    if (!tour) return;
+
+    const updatedMembers = tour.members.map((m) => {
+      if (m.name === fromName) return { ...m, paid: m.paid + amount };
+      if (m.name === toName) return { ...m, paid: m.paid - amount };
+      return m;
+    });
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await updateDoc(doc(db, "users", user.uid, "tours", tourId), {
+      members: updatedMembers,
+    });
   };
 
   const calculateSettlement = (tourId) => {
     const tour = tours.find((t) => t.id === tourId);
     if (!tour) return [];
 
-    const perPerson = tour.perPerson;
+    const members = tour.members || [];
+    const perPerson = tour.perPerson || 0;
+
+    const balances = members.map((m) => ({
+      name: m.name,
+      balance: (m.paid || 0) - perPerson,
+    }));
+
+    const creditors = balances.filter((b) => b.balance > 0);
+    const debtors = balances.filter((b) => b.balance < 0);
+
     const settlements = [];
 
-    const debtors = [];
-    const creditors = [];
+    let i = 0;
+    let j = 0;
 
-    tour.members.forEach((member) => {
-      const balance = member.paid - perPerson;
+    while (i < debtors.length && j < creditors.length) {
+      const debtor = debtors[i];
+      const creditor = creditors[j];
 
-      if (balance > 0) {
-        creditors.push({ ...member, balance });
-      } else if (balance < 0) {
-        debtors.push({ ...member, balance });
-      }
-    });
+      const payAmount = Math.min(Math.abs(debtor.balance), creditor.balance);
 
-    debtors.forEach((debtor) => {
-      let debt = Math.abs(debtor.balance);
-
-      creditors.forEach((creditor) => {
-        if (debt === 0) return;
-
-        const credit = creditor.balance;
-
-        const payAmount = Math.min(debt, credit);
-
-        if (payAmount > 0) {
-          settlements.push({
-            from: debtor.name,
-            to: creditor.name,
-            amount: payAmount,
-          });
-
-          creditor.balance -= payAmount;
-          debt -= payAmount;
-        }
+      settlements.push({
+        from: debtor.name,
+        to: creditor.name,
+        amount: Math.round(payAmount),
       });
-    });
+
+      debtor.balance += payAmount;
+      creditor.balance -= payAmount;
+
+      if (Math.abs(debtor.balance) < 1) i++;
+      if (creditor.balance < 1) j++;
+    }
 
     return settlements;
   };
-  const markTourSettled = (tourId) => {
-    setTours((prev) =>
-      prev.map((tour) =>
-        tour.id === tourId ? { ...tour, status: "Settled" } : tour,
-      ),
-    );
+
+  const markTourSettled = async (tourId) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const tour = tours.find((t) => t.id === tourId);
+    if (!tour) return;
+
+    const clearedMembers = tour.members.map((m) => ({
+      ...m,
+      paid: 0,
+    }));
+
+    await updateDoc(doc(db, "users", user.uid, "tours", tourId), {
+      members: clearedMembers,
+      expenses: [],
+      totalExpense: 0,
+      perPerson: 0,
+      status: "Settled",
+    });
   };
 
   return (
@@ -158,6 +269,7 @@ export const TourProvider = ({ children }) => {
         updateMemberPaid,
         calculateSettlement,
         markTourSettled,
+        settlePayment,
       }}
     >
       {children}

@@ -22,6 +22,7 @@
     "expo": "~54.0.33",
     "expo-build-properties": "~1.0.10",
     "expo-constants": "~18.0.13",
+    "expo-file-system": "~19.0.21",
     "expo-image-picker": "~17.0.10",
     "expo-linear-gradient": "~15.0.8",
     "expo-print": "~15.0.8",
@@ -41,6 +42,7 @@
     "react-native-screens": "~4.16.0",
     "react-native-share": "^12.2.5",
     "react-native-svg": "^15.12.1",
+    "react-native-uuid": "^2.0.3",
     "react-native-web": "^0.21.0",
     "twrnc": "^4.16.0"
   },

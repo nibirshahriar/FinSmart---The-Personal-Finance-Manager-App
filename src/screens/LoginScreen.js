@@ -177,7 +177,7 @@ const LoginScreen = ({ navigation }) => {
 
       <Text style={styles.title}>Welcome to FinSmart</Text>
       <Text style={styles.subtitle}>
-        Login to continue managing your income and expenses.
+        Login to track your income, expenses and tours.
       </Text>
 
       <TextInput

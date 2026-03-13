@@ -12,11 +12,17 @@ import tailwind from "twrnc";
 import { useExpenses } from "../context/ExpenseContext";
 import { useTheme } from "../context/ThemeContext";
 import { useTour } from "../context/TourContext";
+import { addDoc, collection } from "@react-native-firebase/firestore";
+import { getAuth } from "@react-native-firebase/auth";
+import { getFirestore } from "@react-native-firebase/firestore";
 
 const Create = ({ navigation, route }) => {
   const { addExpense } = useExpenses();
   const { addTour } = useTour();
   const { isDarkMode } = useTheme();
+
+  const auth = getAuth();
+  const db = getFirestore();
 
   const [amount, setAmount] = useState("");
   const [title, setTitle] = useState("");
@@ -45,7 +51,7 @@ const Create = ({ navigation, route }) => {
     }
   }, [type]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const numericAmount = Number(amount);
 
     if (type === "tour") {
@@ -60,7 +66,6 @@ const Create = ({ navigation, route }) => {
       }
 
       const newTour = {
-        id: Date.now().toString(),
         name: tourName,
         destination,
         participants: Number(participants),
@@ -72,18 +77,27 @@ const Create = ({ navigation, route }) => {
         status: "Ongoing",
       };
 
-      addTour(newTour);
+      try {
+        const userId = auth.currentUser.uid;
 
-      Alert.alert("Success", "Tour Created Successfully");
+        const docRef = await addDoc(
+          collection(db, "users", userId, "tours"),
+          newTour,
+        );
 
-      setTimeout(() => {
-        navigation.navigate("TourList");
-      }, 300);
+        Alert.alert("Success", "Tour Created Successfully");
 
-      setTourName("");
-      setDestination("");
-      setParticipants("");
-      setType("expense");
+        setTimeout(() => {
+          navigation.navigate("TourList");
+        }, 300);
+
+        setTourName("");
+        setDestination("");
+        setParticipants("");
+        setType("expense");
+      } catch (error) {
+        Alert.alert("Error", "Failed to create tour");
+      }
 
       return;
     }
@@ -142,41 +156,64 @@ const Create = ({ navigation, route }) => {
       ]}
     >
       <ScrollView contentContainerStyle={tailwind`p-6`}>
-        <View style={tailwind`flex-row mb-8 rounded-xl overflow-hidden`}>
+        <View
+          style={tailwind`flex-row mb-8 bg-slate-800 p-1.5 rounded-2xl border border-slate-700`}
+        >
           <Pressable
             onPress={() => setType("expense")}
             style={[
-              tailwind`flex-1 p-4 items-center`,
+              tailwind`flex-1 py-3 items-center rounded-xl`,
               {
-                backgroundColor: type === "expense" ? "#e11d48" : "#334155",
+                backgroundColor: type === "expense" ? "#e11d48" : "transparent",
               },
             ]}
           >
-            <Text style={tailwind`text-white font-bold`}>Expense</Text>
+            <Text
+              style={[
+                tailwind`font-bold`,
+                { color: type === "expense" ? "white" : "#94a3b8" },
+              ]}
+            >
+              Expense
+            </Text>
           </Pressable>
 
           <Pressable
             onPress={() => setType("income")}
             style={[
-              tailwind`flex-1 p-4 items-center`,
+              tailwind`flex-1 py-3 items-center rounded-xl`,
               {
-                backgroundColor: type === "income" ? "#059669" : "#334155",
+                backgroundColor: type === "income" ? "#059669" : "transparent",
               },
             ]}
           >
-            <Text style={tailwind`text-white font-bold`}>Income</Text>
+            <Text
+              style={[
+                tailwind`font-bold`,
+                { color: type === "income" ? "white" : "#94a3b8" },
+              ]}
+            >
+              Income
+            </Text>
           </Pressable>
 
           <Pressable
             onPress={() => setType("tour")}
             style={[
-              tailwind`flex-1 p-4 items-center`,
+              tailwind`flex-1 py-3 items-center rounded-xl`,
               {
-                backgroundColor: type === "tour" ? "#0ea5e9" : "#334155",
+                backgroundColor: type === "tour" ? "#0ea5e9" : "transparent",
               },
             ]}
           >
-            <Text style={tailwind`text-white font-bold`}>Tour</Text>
+            <Text
+              style={[
+                tailwind`font-bold`,
+                { color: type === "tour" ? "white" : "#94a3b8" },
+              ]}
+            >
+              Tour
+            </Text>
           </Pressable>
         </View>
 

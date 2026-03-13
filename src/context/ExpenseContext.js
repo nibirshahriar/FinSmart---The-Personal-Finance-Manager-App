@@ -27,7 +27,14 @@ export function ExpenseProvider({ children }) {
 
   //Listen to Auth + Firestore (REALTIME)
   useEffect(() => {
+    let unsubscribeSnapshot = null;
+
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+        unsubscribeSnapshot = null;
+      }
+
       if (!user) {
         setExpenses([]);
         return;
@@ -36,7 +43,7 @@ export function ExpenseProvider({ children }) {
       const expensesRef = collection(db, "users", user.uid, "expenses");
       const q = query(expensesRef, orderBy("createdAt", "desc"));
 
-      const unsubscribeSnapshot = onSnapshot(
+      unsubscribeSnapshot = onSnapshot(
         q,
         (snapshot) => {
           const list = snapshot.docs.map((doc) => ({
@@ -47,14 +54,17 @@ export function ExpenseProvider({ children }) {
           setExpenses(list);
         },
         (error) => {
-          console.log("Snapshot error:", error.message);
+          if (!String(error?.code).includes("permission-denied")) {
+            console.log("Expense snapshot error:", error);
+          }
         },
       );
-
-      return unsubscribeSnapshot;
     });
 
-    return unsubscribeAuth;
+    return () => {
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
+      unsubscribeAuth();
+    };
   }, []);
 
   // Add Expense / Income

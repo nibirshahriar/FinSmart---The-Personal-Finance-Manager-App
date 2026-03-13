@@ -9,11 +9,16 @@ export const ThemeProvider = ({ children }) => {
   // Load saved theme
   useEffect(() => {
     const loadTheme = async () => {
-      const savedTheme = await AsyncStorage.getItem("theme");
-      if (savedTheme !== null) {
-        setIsDarkMode(savedTheme === "dark");
+      try {
+        const savedTheme = await AsyncStorage.getItem("theme");
+        if (savedTheme !== null) {
+          setIsDarkMode(savedTheme === "dark");
+        }
+      } catch (e) {
+        console.log("Theme load error:", e);
       }
     };
+
     loadTheme();
   }, []);
 
