@@ -14,7 +14,8 @@ import AuthNavigator from "./src/navigation/AuthNavigator";
 import { TourProvider } from "./src/context/TourContext";
 
 const Root = () => {
-  const [user, setUser] = useState(undefined);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
@@ -22,13 +23,13 @@ const Root = () => {
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
+      setLoading(false);
     });
 
     return unsubscribe;
   }, []);
 
-  //Loading while checking auth state
-  if (user === undefined) {
+  if (loading) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" />

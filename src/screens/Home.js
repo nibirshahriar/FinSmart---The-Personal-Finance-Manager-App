@@ -100,6 +100,18 @@ const Home = ({ navigation }) => {
           Tk. {currentBalance.toFixed(2)}
         </Text>
 
+        {currentBalance < 0 && (
+          <Text
+            style={{
+              color: isDarkMode ? "#f87171" : "#dc2626",
+              marginTop: 6,
+              fontWeight: "600",
+            }}
+          >
+            ⚠️ You are overspending
+          </Text>
+        )}
+
         <View style={tailwind`flex-row justify-between mt-6`}>
           <View>
             <Text style={tailwind`text-gray-200 text-lg`}>Expense</Text>

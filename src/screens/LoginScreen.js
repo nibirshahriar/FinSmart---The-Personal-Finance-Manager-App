@@ -401,6 +401,6 @@ const styles = StyleSheet.create({
     width: 300,
     height: 200,
     resizeMode: "contain",
-    marginVertical: 10,
+    marginVertical: 6,
   },
 });

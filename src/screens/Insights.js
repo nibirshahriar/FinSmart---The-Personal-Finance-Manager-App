@@ -10,16 +10,12 @@ const Insights = () => {
   const { expenses } = useExpenses();
   const { isDarkMode } = useTheme();
 
-  // =====================================
   // Calculate Income
-  // =====================================
   const totalIncome = expenses
     .filter((item) => item.type === "income")
     .reduce((sum, item) => sum + Number(item.amount), 0);
 
-  // =====================================
   // Calculate Expense (Safe filter)
-  // =====================================
   const expenseOnly = expenses.filter((item) => item.type !== "income");
 
   const totalExpense = expenseOnly.reduce(
@@ -27,17 +23,13 @@ const Insights = () => {
     0,
   );
 
-  // =====================================
   // Balance Calculation
-  // =====================================
   const balance = totalIncome - totalExpense;
   const isProfit = balance >= 0;
 
   const total = totalIncome + totalExpense;
 
-  // =====================================
-  // Income vs Expense Chart (with %)
-  // =====================================
+  // Income vs Expense Chart
   const overviewData =
     total === 0
       ? []
@@ -54,9 +46,7 @@ const Insights = () => {
           },
         ];
 
-  // =====================================
-  // Category Breakdown (Expense Only)
-  // =====================================
+  // Category Breakdown
   const rawPieData = processDataForPieChart(expenseOnly);
 
   const pieChartData = rawPieData.map((item) => ({
@@ -73,7 +63,7 @@ const Insights = () => {
       contentContainerStyle={{ paddingBottom: 100 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* ================= BALANCE CARD ================= */}
+      {/*  BALANCE CARD  */}
       <View
         style={[
           tailwind`mx-5 mt-6 p-6 rounded-3xl`,
@@ -91,7 +81,7 @@ const Insights = () => {
         </Text>
       </View>
 
-      {/* ================= INCOME VS EXPENSE ================= */}
+      {/*   INCOME VS EXPENSE */}
       <Text
         style={[
           tailwind`text-xl font-bold text-center mt-8`,
@@ -138,7 +128,7 @@ const Insights = () => {
         </Text>
       </View>
 
-      {/* ================= SPENDING BREAKDOWN ================= */}
+      {/* SPENDING BREAKDOWN */}
       <Text
         style={[
           tailwind`text-xl font-bold text-center mt-8`,
