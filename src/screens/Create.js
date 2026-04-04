@@ -15,6 +15,8 @@ import { useTour } from "../context/TourContext";
 import { addDoc, collection } from "@react-native-firebase/firestore";
 import { getAuth } from "@react-native-firebase/auth";
 import { getFirestore } from "@react-native-firebase/firestore";
+import { Ionicons } from "@expo/vector-icons";
+
 
 const Create = ({ navigation, route }) => {
   const { addExpense } = useExpenses();
@@ -406,9 +408,18 @@ const Create = ({ navigation, route }) => {
                   ]}
                 >
                   <View style={tailwind`flex-row items-center`}>
-                    <Text style={tailwind`text-2xl mr-3`}>
-                      {category ? category.icon : "☰"}
-                    </Text>
+                    {category ? (
+                      <Text style={tailwind`text-2xl mr-3`}>
+                        {category.icon}
+                      </Text>
+                    ) : (
+                      <Ionicons
+                        name="menu"
+                        size={24}
+                        color={isDarkMode ? "#fff" : "#000"}
+                        style={{ marginRight: 10 }}
+                      />
+                    )}
 
                     <Text
                       style={[

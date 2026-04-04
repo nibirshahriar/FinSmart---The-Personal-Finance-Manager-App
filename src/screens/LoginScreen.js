@@ -17,12 +17,13 @@ import {
   GoogleAuthProvider,
   signInWithCredential,
   signOut,
+  sendPasswordResetEmail,
 } from "@react-native-firebase/auth";
 
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Path } from "react-native-svg";
-import { sendEmailVerification } from "firebase/auth";
+import { sendEmailVerification } from "@react-native-firebase/auth";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -122,18 +123,48 @@ const LoginScreen = ({ navigation }) => {
 
       if (
         error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password" ||
         error.code === "auth/invalid-credential"
       ) {
         Alert.alert(
           "Login Failed",
-          "Account not found. Please create a new account.",
+          "Invalid email or password. Please try again.",
         );
-      } else if (error.code === "auth/wrong-password") {
-        Alert.alert("Login Failed", "Incorrect password.");
       } else if (error.code === "auth/invalid-email") {
         Alert.alert("Login Failed", "Invalid email format.");
       } else {
         Alert.alert("Login Failed", error.message);
+      }
+    }
+  };
+
+  // forget password set
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      Alert.alert("Error", "Please enter your email first");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await sendPasswordResetEmail(auth, email.trim());
+
+      setLoading(false);
+
+      Alert.alert(
+        "Password Reset Email Sent",
+        "Check your email to reset your password.",
+      );
+    } catch (error) {
+      setLoading(false);
+
+      if (error.code === "auth/user-not-found") {
+        Alert.alert("Error", "No account found with this email.");
+      } else if (error.code === "auth/invalid-email") {
+        Alert.alert("Error", "Invalid email format.");
+      } else {
+        Alert.alert("Error", error.message);
       }
     }
   };
@@ -207,6 +238,19 @@ const LoginScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+      {/* forget password */}
+      <TouchableOpacity onPress={handleForgotPassword}>
+        <Text
+          style={{
+            color: "#2e7d32",
+            alignSelf: "flex-end",
+            marginBottom: 10,
+          }}
+        >
+          Forgot Password?
+        </Text>
+      </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.button}
         onPress={handleLogin}
@@ -231,15 +275,15 @@ const LoginScreen = ({ navigation }) => {
           onPress={handleGoogleLogin}
         >
           <GoogleIcon />
-          <Text style={styles.googleText}> Continue with Google</Text>
+          <Text style={styles.googleText}>Google</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.socialButton, styles.phoneButton]}
           onPress={() => navigation.navigate("PhoneLogin")}
         >
-          <Ionicons name="call-outline" size={18} color="#fff" />
-          <Text style={styles.phoneText}> Login with Phone</Text>
+          <Ionicons name="call-outline" size={20} color="#fff" />
+          <Text style={styles.phoneText}>Phone</Text>
         </TouchableOpacity>
       </View>
 
@@ -353,7 +397,7 @@ const styles = StyleSheet.create({
   socialRow: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: "space-between",
+    gap: 10,
   },
   socialButton: {
     flex: 1,
@@ -361,26 +405,29 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 5,
     flexDirection: "row",
   },
   googleButton: {
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#db4437",
+    paddingHorizontal: 12,
   },
   phoneButton: {
     backgroundColor: "#111827",
+    paddingHorizontal: 12,
   },
   googleText: {
     fontWeight: "600",
-    fontSize: 14,
+    fontSize: 13,
     color: "#333",
+    marginLeft: 6,
   },
   phoneText: {
     fontWeight: "600",
-    fontSize: 14,
+    fontSize: 13,
     color: "#fff",
+    marginLeft: 6,
   },
   signupContainer: {
     flexDirection: "row",
