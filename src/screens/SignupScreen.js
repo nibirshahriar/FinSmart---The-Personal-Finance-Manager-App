@@ -8,13 +8,14 @@ import {
   ScrollView,
   ActivityIndicator,
   View,
-} from "react-native"; 
+} from "react-native";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signOut,
 } from "@react-native-firebase/auth";
+import { useTheme } from "../context/ThemeContext";
 
 const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ const SignupScreen = ({ navigation }) => {
 
   // Initialize auth (modular style)
   const auth = getAuth();
+  const { isDarkMode } = useTheme();
 
   const handleSignup = async () => {
     if (!email.trim() || !password.trim()) {
@@ -85,7 +87,8 @@ const SignupScreen = ({ navigation }) => {
       {/* Email Input */}
       <TextInput
         style={styles.input}
-        placeholder="Email Address"
+        placeholder="Enter your email"
+        placeholderTextColor={isDarkMode ? "#94a3b8" : "#9ca3af"}
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
@@ -96,6 +99,7 @@ const SignupScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Password (min 6 characters)"
+        placeholderTextColor={isDarkMode ? "#94a3b8" : "#9ca3af"}
         secureTextEntry
         value={password}
         onChangeText={setPassword}

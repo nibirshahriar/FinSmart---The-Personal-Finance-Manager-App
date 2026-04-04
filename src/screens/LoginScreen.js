@@ -24,6 +24,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Path } from "react-native-svg";
 import { sendEmailVerification } from "@react-native-firebase/auth";
+import { useTheme } from "../context/ThemeContext";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -32,7 +33,7 @@ const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
-
+  const { isDarkMode } = useTheme();
   // Google Config
   useEffect(() => {
     GoogleSignin.configure({
@@ -213,7 +214,8 @@ const LoginScreen = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Email Address"
+        placeholder="Enter your email"
+        placeholderTextColor={isDarkMode ? "#94a3b8" : "#9ca3af"}
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
@@ -224,7 +226,8 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.passwordInput}
-          placeholder="Password"
+          placeholder="Enter your password"
+          placeholderTextColor={isDarkMode ? "#94a3b8" : "#9ca3af"}
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}

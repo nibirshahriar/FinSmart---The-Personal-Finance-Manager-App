@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { getAuth, signInWithPhoneNumber } from "@react-native-firebase/auth";
-
+import { useTheme } from "../context/ThemeContext";
 const PhoneLoginScreen = ({ navigation }) => {
   const auth = getAuth();
 
@@ -19,6 +19,8 @@ const PhoneLoginScreen = ({ navigation }) => {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
+
+const { isDarkMode } = useTheme();
 
   // FORMAT PHONE 
   const formatPhoneNumber = (number) => {
@@ -94,6 +96,7 @@ const PhoneLoginScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="01XXXXXXXXX"
+            placeholderTextColor={isDarkMode ? "#94a3b8" : "#9ca3af"}
             keyboardType="phone-pad"
             value={phone}
             onChangeText={setPhone}
