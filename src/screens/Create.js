@@ -17,7 +17,6 @@ import { getAuth } from "@react-native-firebase/auth";
 import { getFirestore } from "@react-native-firebase/firestore";
 import { Ionicons } from "@expo/vector-icons";
 
-
 const Create = ({ navigation, route }) => {
   const { addExpense } = useExpenses();
   const { addTour } = useTour();
@@ -150,6 +149,22 @@ const Create = ({ navigation, route }) => {
       ? !tourName || !destination || !participants
       : !amount || !title;
 
+  // calcultor
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calcValue, setCalcValue] = useState("");
+
+  const handleCalcPress = (val) => {
+    if (val === "C") return setCalcValue("");
+    if (val === "=") {
+      try {
+        setCalcValue(eval(calcValue).toString());
+      } catch {
+        setCalcValue("Error");
+      }
+      return;
+    }
+    setCalcValue((prev) => prev + val);
+  };
   return (
     <View
       style={[
@@ -453,6 +468,108 @@ const Create = ({ navigation, route }) => {
           </Text>
         </Pressable>
       </ScrollView>
+      <Pressable
+        onPress={() => setShowCalculator(true)}
+        style={{
+          position: "absolute",
+          bottom: 25,
+          right: 20,
+          backgroundColor: "#2563EB",
+          width: 55,
+          height: 55,
+          borderRadius: 30,
+          justifyContent: "center",
+          alignItems: "center",
+          elevation: 5,
+        }}
+      >
+        <Ionicons name="calculator-outline" size={24} color="#fff" />
+      </Pressable>
+      {showCalculator && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              width: "85%",
+              backgroundColor: "#fff",
+              borderRadius: 16,
+              padding: 20,
+            }}
+          >
+            <Text style={{ fontSize: 26, marginBottom: 15 }}>
+              {calcValue || "0"}
+            </Text>
+
+            {[
+              ["7", "8", "9", "/"],
+              ["4", "5", "6", "*"],
+              ["1", "2", "3", "-"],
+              ["0", ".", "=", "+"],
+              ["C"],
+            ].map((row, i) => (
+              <View key={i} style={{ flexDirection: "row", marginBottom: 10 }}>
+                {row.map((btn) => (
+                  <Pressable
+                    key={btn}
+                    onPress={() => handleCalcPress(btn)}
+                    style={{
+                      flex: 1,
+                      margin: 5,
+                      padding: 15,
+                      backgroundColor: "#e5e7eb",
+                      borderRadius: 10,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ fontSize: 18 }}>{btn}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            ))}
+
+            <Pressable
+              onPress={() => {
+                setAmount(calcValue);
+                setShowCalculator(false);
+              }}
+              style={{
+                backgroundColor: "#22c55e",
+                padding: 12,
+                borderRadius: 10,
+                alignItems: "center",
+                marginTop: 10,
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                Use Result
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => setShowCalculator(false)}
+              style={{
+                backgroundColor: "#ef4444",
+                padding: 12,
+                borderRadius: 10,
+                alignItems: "center",
+                marginTop: 10,
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
