@@ -225,7 +225,7 @@ const LoginScreen = ({ navigation }) => {
       {/* PASSWORD WITH EYE ICON */}
       <View style={styles.passwordContainer}>
         <TextInput
-          style={styles.passwordInput}
+          style={[styles.passwordInput, { color: "#000" }]}
           placeholder="Enter your password"
           placeholderTextColor={isDarkMode ? "#94a3b8" : "#9ca3af"}
           secureTextEntry={!showPassword}
